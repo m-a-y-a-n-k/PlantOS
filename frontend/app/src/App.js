@@ -1,45 +1,40 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import leaf from './healthy.jpg';
 import Notifier from './components/Notifier';
 import Canvas from './components/Canvas';
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      offline: false
-    }
-  }
 
-  componentDidMount() {
-    window.addEventListener('online', () => {
-      this.setState({ offline: false });
-    });
+const App = () => {
+  const [offline, setOffline] = useState(false);
 
-    window.addEventListener('offline', () => {
-      this.setState({ offline: true });
-    });
-  }
+  useEffect(() => {
+    const updateOnlineStatus = () => {
+      setOffline(!navigator.onLine);
+    };
 
-  componentDidUpdate() {
-    let offlineStatus = !navigator.onLine;
-    if (this.state.offline !== offlineStatus) {
-      this.setState({ offline: offlineStatus });
-    }
-  }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={leaf} className="App-logo" alt="Healthy Leaves" />
-          <h1 className="App-title">Plant OS</h1>
-        </header>
-        <Notifier offline={this.state.offline} />
-        <Canvas offline={this.state.offline} />
-      </div>
-    );
-  }
-}
+    // Initial check for online status
+    updateOnlineStatus();
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
+  }, []);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={leaf} className="App-logo" alt="Healthy Leaves" />
+        <h1 className="App-title">Plant OS</h1>
+      </header>
+      <Notifier offline={offline} />
+      <Canvas offline={offline} />
+    </div>
+  );
+};
 
 export default App;
