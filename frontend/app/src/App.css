@@ -1,29 +1,72 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(
+    40deg,
+    rgb(193, 220, 233) 0%,
+    rgb(30, 91, 181) 75%,
+    rgb(54, 127, 211) 95%
+  );
+  width: 100%;
+}
+
 .App {
   text-align: center;
 }
 
 .App-header {
-  padding: 16px;
-  background-color: #96d19f;
-  font-size: calc(10px + 2vmin);
+  padding: 8px;
+  background: linear-gradient(25deg, #0b4a26e2, white);
+  font-size: calc(1rem + 1vmin);
   color: white;
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-.App-title{
+.App-title {
   color: rgb(16, 41, 28);
   margin-left: 24px;
 }
 
+.App-subtitle {
+  color: rgb(11, 52, 87);
+  margin-left: 36px;
+}
+
 .App-logo {
-  display: 'flex';
+  display: "flex";
   border-radius: 50%;
   cursor: pointer;
-  height: 120px;
-  width: 120px;
-  justify-content: 'start';
+  height: 80px;
+  width: 80px;
+  justify-content: "start";
+}
+
+button {
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: scale(1.1);
+  transition: 1s ease-in-out linear 0ms;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
 }

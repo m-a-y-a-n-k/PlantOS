@@ -13,7 +13,7 @@ const Canvas = ({ offline }) => {
   const captureImage = async () => {
     const capturedData = webcam.current.takeBase64Photo({
       type: "jpeg",
-      quality: 0.8,
+      quality: 2,
     });
     setCaptured(true);
     setCapturedImage(capturedData.base64);
@@ -25,7 +25,6 @@ const Canvas = ({ offline }) => {
 
   const checkUploadStatus = useCallback(
     (data) => {
-
       setUploading(false);
       if (data.status === 200) {
         alert("Image Uploaded to Library");
@@ -68,16 +67,17 @@ const Canvas = ({ offline }) => {
 
   const imageDisplay = capturedImage ? (
     <img src={capturedImage} alt="captured" width="350" />
-  ) : (
-    <span />
-  );
+  ) : null;
 
   const buttons = captured ? (
-    <div>
-      <button className="deleteButton" onClick={discardImage}>
-        Delete Photo
+    <div class="button-group">
+      <button className="discardButton" onClick={discardImage}>
+        Discard Photo
       </button>
-      <button className="captureButton" onClick={uploadImage}>
+      <button className="captureButton" onClick={captureImage}>
+        Take Another
+      </button>
+      <button className="uploadButton" onClick={uploadImage}>
         Upload Photo
       </button>
     </div>
@@ -91,9 +91,7 @@ const Canvas = ({ offline }) => {
     <div>
       <p>Uploading Image, please wait ...</p>
     </div>
-  ) : (
-    <span />
-  );
+  ) : null;
 
   useEffect(() => {
     // Initialize the camera
@@ -127,19 +125,25 @@ const Canvas = ({ offline }) => {
   }, [offline, checkUploadStatus]);
 
   return (
-    <div>
-      {uploadingMessage}
-      <video
-        autoPlay
-        playsInline
-        muted
-        ref={webcamRef}
-        width="100%"
-        height="200"
-      />
-      <br />
-      <div className="imageCanvas">{imageDisplay}</div>
+    <div class="uploadCanvas">
       {buttons}
+      {uploadingMessage}
+      <div class="mediaGroup">
+        <video
+          autoPlay
+          playsInline
+          muted
+          ref={webcamRef}
+          width="100%"
+          height="300"
+        />
+        {imageDisplay && (
+          <figure className="imageCanvas">
+            {imageDisplay}
+            <figcaption>Image captured from feed.</figcaption>
+          </figure>
+        )}
+      </div>
     </div>
   );
 };
