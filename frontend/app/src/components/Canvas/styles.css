@@ -5,14 +5,14 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  padding-bottom: 40px;
+  padding-top: 32px;
 }
 
 .captureButton {
   padding: 10px;
   padding-left: 20px;
   padding-right: 20px;
-  background-color: #1169a8;
+  background-color: #116535;
   color: white;
   border-radius: 5px;
 }

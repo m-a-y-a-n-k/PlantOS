@@ -31,12 +31,11 @@ const App = () => {
         <img src={leaf} className="App-logo" alt="Healthy Leaves" />
         <h1 className="App-title">Plant OS</h1>
         <h4 className="App-subtitle">
-          {" "}
-          - Know your plant better through statistic insights.
+          Know your plant better through statistic insights.
         </h4>
       </header>
-      <main>
-        <Notifier offline={offline} />
+      <Notifier offline={offline} />
+      <main className="mainContent">
         <Canvas offline={offline} />
       </main>
     </div>

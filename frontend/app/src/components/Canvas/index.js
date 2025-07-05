@@ -72,18 +72,18 @@ const Canvas = ({ offline }) => {
   const buttons = captured ? (
     <div class="button-group">
       <button className="discardButton" onClick={discardImage}>
-        Discard Photo
+        Discard Plant
       </button>
       <button className="captureButton" onClick={captureImage}>
-        Take Another
+        Scan Another
       </button>
       <button className="uploadButton" onClick={uploadImage}>
-        Upload Photo
+        Upload Plant
       </button>
     </div>
   ) : (
     <button className="captureButton" onClick={captureImage}>
-      Take Picture
+      Scan Plant
     </button>
   );
 
@@ -135,7 +135,7 @@ const Canvas = ({ offline }) => {
           muted
           ref={webcamRef}
           width="100vw"
-          height="300"
+          height="275"
         />
         {imageDisplay && (
           <figure className="imageCanvas">
