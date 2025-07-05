@@ -2,8 +2,9 @@
   background-color: transparent;
   padding: 20px;
   text-align: center;
-  color: rgb(167, 227, 217);
+  color: rgb(4, 52, 37);
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .danger {

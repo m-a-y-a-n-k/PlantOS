@@ -134,7 +134,7 @@ const Canvas = ({ offline }) => {
           playsInline
           muted
           ref={webcamRef}
-          width="100%"
+          width="100vw"
           height="300"
         />
         {imageDisplay && (

@@ -8,14 +8,14 @@ const Notifier = ({ offline }) => {
   });
 
   const message = offline
-    ? `Application is offline! Your images will be saved now and automatically uploaded to our library later once your Internet connection is back up.`
-    : `Take a picture to upload it to our library.`;
+    ? `Application is offline! Please connect to the internet.`
+    : `We strive for a greener and healthier Planet for us and our future generations.`;
 
   return (
     <div className={notifyClass}>
-      <p>
+      <h4>
         <em>{message}</em>
-      </p>
+      </h4>
     </div>
   );
 };

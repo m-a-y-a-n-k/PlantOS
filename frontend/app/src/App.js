@@ -35,8 +35,10 @@ const App = () => {
           - Know your plant better through statistic insights.
         </h4>
       </header>
-      <Notifier offline={offline} />
-      <Canvas offline={offline} />
+      <main>
+        <Notifier offline={offline} />
+        <Canvas offline={offline} />
+      </main>
     </div>
   );
 };
