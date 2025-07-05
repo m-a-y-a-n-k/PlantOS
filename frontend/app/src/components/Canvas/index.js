@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Webcam from "../../helpers/WebCam";
 import "./styles.css";
+import DetectedPlantInfo from "../DetectedPlantInfo";
+import { detectedPlant } from "../DetectedPlantInfo/samplePlant";
 
 const Canvas = ({ offline }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [captured, setCaptured] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showDetectedPlantInfo, setShowDetectedPlantInfo] = useState(false);
 
   const webcamRef = useRef(null);
   const webcam = useRef(null);
@@ -70,7 +73,7 @@ const Canvas = ({ offline }) => {
   ) : null;
 
   const buttons = captured ? (
-    <div class="button-group">
+    <div className="button-group">
       <button className="discardButton" onClick={discardImage}>
         Discard Plant
       </button>
@@ -79,6 +82,12 @@ const Canvas = ({ offline }) => {
       </button>
       <button className="uploadButton" onClick={uploadImage}>
         Upload Plant
+      </button>
+      <button
+        className="infoButton"
+        onClick={() => setShowDetectedPlantInfo(true)}
+      >
+        Show Plant Info
       </button>
     </div>
   ) : (
@@ -125,10 +134,8 @@ const Canvas = ({ offline }) => {
   }, [offline, checkUploadStatus]);
 
   return (
-    <div class="uploadCanvas">
-      {buttons}
-      {uploadingMessage}
-      <div class="mediaGroup">
+    <div className="uploadCanvas">
+      <div className="mediaGroup">
         <video
           autoPlay
           playsInline
@@ -144,6 +151,14 @@ const Canvas = ({ offline }) => {
           </figure>
         )}
       </div>
+      {buttons}
+      {uploadingMessage}
+      {showDetectedPlantInfo && (
+        <DetectedPlantInfo
+          plant={detectedPlant}
+          closeDialog={() => setShowDetectedPlantInfo(false)}
+        />
+      )}
     </div>
   );
 };

@@ -9,7 +9,7 @@ const Notifier = ({ offline }) => {
 
   const message = offline
     ? `Application is offline! Please connect to the internet.`
-    : `We strive for a greener and healthier Planet for us and our future generations.`;
+    : `We should always strive for a greener and healthier Planet for us and our future generations.`;
 
   return (
     <div className={notifyClass}>

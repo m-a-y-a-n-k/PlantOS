@@ -5,7 +5,15 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  padding-top: 32px;
+}
+
+.infoButton {
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #113065;
+  color: white;
+  border-radius: 5px;
 }
 
 .captureButton {
