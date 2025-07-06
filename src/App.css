@@ -71,6 +71,10 @@ h1, h2, h3, h4, h5, h6 {
   color: #61dafb;
 }
 
+.mainContent {
+  padding-top: 24px;
+}
+
 .App-title {
   color: rgb(16, 41, 28);
   margin-left: 24px;
