@@ -29,5 +29,6 @@
 
 ```bash
 git clone https://github.com/m-a-y-a-n-k/PlantOS.git
+cd frontend
 npm install
 npm run start  
