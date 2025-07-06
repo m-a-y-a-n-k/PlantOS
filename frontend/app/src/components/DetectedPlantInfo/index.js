@@ -11,7 +11,15 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
       if (ready) {
         const results = await detect(capturedImage, classifier);
         if (results.length > 0) {
-          setPlant(results[0]);
+          let mostConfidentResult = null;
+          results.forEach((result) => {
+            if (!mostConfidentResult) {
+              mostConfidentResult = result;
+            } else if (mostConfidentResult.confidence < result.confidence) {
+              mostConfidentResult = result;
+            }
+          });
+          setPlant(mostConfidentResult);
         }
       }
     })();
