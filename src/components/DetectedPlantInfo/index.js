@@ -21,9 +21,7 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
             }
           });
           if (mostConfidentResult) {
-            const plantDetails = fetchPlantInfo(
-              mostConfidentResult.label
-            );
+            const plantDetails = fetchPlantInfo(mostConfidentResult.label);
             setPlant(plantDetails);
           }
         }
@@ -32,7 +30,17 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
   }, [ready, capturedImage, detect, classifier]);
 
   if (!plant) {
-    return null;
+    return (
+      <div className="plant-info-dialog">
+        <div className="plant-info-card">
+          <span className="plant-info-dialog-close" onClick={closeDialog}>
+            X
+          </span>
+          <h2>Sorry! Could not detect the plant.</h2>
+          <p>Please try again and provide a plant image</p>
+        </div>
+      </div>
+    );
   }
 
   return (
