@@ -31,3 +31,13 @@
 git clone https://github.com/m-a-y-a-n-k/PlantOS.git
 npm install
 npm run start
+```
+
+### 🧠 Technology Stack
+
+- React – frontend framework
+- TensorFlow.js – for ML in the browser
+- MobileNet – lightweight image classifier
+- CRA – for fast development builds
+- PWA APIs – offline support and installability
+- CSS Modules – component-scoped styles
