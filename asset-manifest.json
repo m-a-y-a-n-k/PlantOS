@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/PlantOS/static/css/main.42bed536.css",
-    "main.js": "/PlantOS/static/js/main.078d18fd.js",
+    "main.css": "/PlantOS/static/css/main.44ba99e8.css",
+    "main.js": "/PlantOS/static/js/main.671c8ea3.js",
     "static/media/garden.jpg": "/PlantOS/static/media/garden.438d0e950954d5ef4ab5.jpg",
-    "static/media/healthy.jpg": "/PlantOS/static/media/healthy.d8cad3fda60819601e0d.jpg",
+    "static/media/healthy.jpg": "/PlantOS/static/media/healthy.1772b5c51fef2011cacf.jpg",
     "index.html": "/PlantOS/index.html",
-    "main.42bed536.css.map": "/PlantOS/static/css/main.42bed536.css.map",
-    "main.078d18fd.js.map": "/PlantOS/static/js/main.078d18fd.js.map"
+    "main.44ba99e8.css.map": "/PlantOS/static/css/main.44ba99e8.css.map",
+    "main.671c8ea3.js.map": "/PlantOS/static/js/main.671c8ea3.js.map"
   },
   "entrypoints": [
-    "static/css/main.42bed536.css",
-    "static/js/main.078d18fd.js"
+    "static/css/main.44ba99e8.css",
+    "static/js/main.671c8ea3.js"
   ]
 }
