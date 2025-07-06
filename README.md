@@ -29,6 +29,5 @@
 
 ```bash
 git clone https://github.com/m-a-y-a-n-k/PlantOS.git
-cd plantos
 npm install
 npm run start  
