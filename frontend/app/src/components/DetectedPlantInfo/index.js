@@ -7,8 +7,8 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
   const [plant, setPlant] = useState(null);
 
   useEffect(() => {
-    (async () => {
-      if (ready) {
+    if (ready) {
+      (async () => {
         const results = await detect(capturedImage, classifier);
         if (results.length > 0) {
           let mostConfidentResult = null;
@@ -21,15 +21,13 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
           });
           setPlant(mostConfidentResult);
         }
-      }
-    })();
+      })();
+    }
   }, [ready, capturedImage, detect, classifier]);
 
   if (!plant) {
     return null;
   }
-
-  console.log({ plant });
 
   return (
     <div className="plant-info-dialog">
