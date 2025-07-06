@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import leaf from "./healthy.jpg";
-import Notifier from "./components/Notifier";
 import Canvas from "./components/Canvas";
 import PlantScenery from "./components/Scenery";
 
@@ -27,23 +26,21 @@ const App = () => {
   }, []);
 
   return (
-    <PlantScenery>
-      <div className="App">
-        <header className="App-header">
-          <img src={leaf} className="App-logo" alt="Healthy Leaves" />
-          <h1 className="App-title">Plant OS</h1>
-          <h4 className="App-subtitle">
-            Know your plant better through statistic insights.
-          </h4>
-        </header>
-        <main className="mainContent">
-          <Canvas offline={offline} />
-        </main>
-        <footer className="App-footer">
-          <Notifier offline={offline} />
-        </footer>
-      </div>
-    </PlantScenery>
+    <div className="App">
+      <header className="App-header">
+        <img src={leaf} className="App-logo" alt="Healthy Leaves" />
+        <h1 className="App-title">Plant OS</h1>
+        <h4 className="App-subtitle">
+          Know your plant better through statistic insights.
+        </h4>
+      </header>
+      <main className="mainContent">
+        <Canvas offline={offline} />
+      </main>
+      <footer className="App-footer">
+        <PlantScenery />
+      </footer>
+    </div>
   );
 };
 

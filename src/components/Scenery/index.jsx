@@ -213,13 +213,38 @@ const PlantScenery = () => {
   };
 
   return (
-    <Sketch
-      setup={setup}
-      draw={draw}
-      mousePressed={mousePressed}
-      keyPressed={keyPressed}
-      windowResized={windowResized}
-    />
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <Sketch
+        setup={setup}
+        draw={draw}
+        mousePressed={mousePressed}
+        keyPressed={keyPressed}
+        windowResized={windowResized}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          top: "5%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          color: "#fff",
+          fontSize: "1.2rem",
+          textAlign: "center",
+          padding: "1rem",
+          maxWidth: "600px",
+          fontFamily: "Georgia, serif",
+          backgroundColor: "rgba(0,0,0,0.4)",
+          borderRadius: "12px",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <strong>
+          We should always strive for a healthier and greener planet for us and
+          our future generations.
+        </strong>
+      </div>
+    </div>
   );
 };
 
