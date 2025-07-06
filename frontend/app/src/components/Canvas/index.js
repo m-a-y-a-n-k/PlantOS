@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Webcam from "../../helpers/WebCam";
 import "./styles.css";
 import DetectedPlantInfo from "../DetectedPlantInfo";
-import { detectedPlant } from "../DetectedPlantInfo/samplePlant";
 
 const Canvas = ({ offline }) => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -61,6 +60,7 @@ const Canvas = ({ offline }) => {
       if (localStorage.hasOwnProperty(i)) {
         if (i.match(query) || (!query && typeof i === "string")) {
           const value = localStorage.getItem(i);
+          localStorage.removeItem(i);
           results.push({ key: i, val: value });
         }
       }
@@ -153,9 +153,9 @@ const Canvas = ({ offline }) => {
       </div>
       {buttons}
       {uploadingMessage}
-      {showDetectedPlantInfo && (
+      {showDetectedPlantInfo && capturedImage && (
         <DetectedPlantInfo
-          plant={detectedPlant}
+          capturedImage={capturedImage}
           closeDialog={() => setShowDetectedPlantInfo(false)}
         />
       )}

@@ -1,8 +1,27 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import usePlantDetector from "../../helpers/plantDetector";
 import "./styles.css";
 
-function DetectedPlantInfo({ plant, closeDialog }) {
-  if (!plant) return null;
+function DetectedPlantInfo({ capturedImage, closeDialog }) {
+  const { detect, ready, classifier } = usePlantDetector(capturedImage);
+  const [plant, setPlant] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      if (ready) {
+        const results = await detect(capturedImage, classifier);
+        if (results.length > 0) {
+          setPlant(results[0]);
+        }
+      }
+    })();
+  }, [ready, capturedImage, detect, classifier]);
+
+  if (!plant) {
+    return null;
+  }
+
+  console.log({ plant });
 
   return (
     <div className="plant-info-dialog">
@@ -10,16 +29,18 @@ function DetectedPlantInfo({ plant, closeDialog }) {
         <span className="plant-info-dialog-close" onClick={closeDialog}>
           X
         </span>
-        <h2 className="plant-name">{plant.commonName}</h2>
-        <p className="plant-scientific">({plant.scientificName})</p>
-        <p className="plant-description">{plant.description}</p>
-
+        <h2 className="plant-name">{plant.label}</h2>
+        {plant.scientificName && (
+          <p className="plant-scientific">({plant.scientificName})</p>
+        )}
+        {plant.description && (
+          <p className="plant-description">{plant.description}</p>
+        )}
         {plant.confidence && (
           <p className="plant-confidence">
             Confidence: {Math.round(plant.confidence * 100)}%
           </p>
         )}
-
         {plant.image && (
           <img
             className="plant-image"
