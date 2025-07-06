@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import usePlantDetector from "../../helpers/plantDetector";
 import "./styles.css";
+import { fetchPlantInfo } from "../../helpers/fetchPlantInfo";
 
 function DetectedPlantInfo({ capturedImage, closeDialog }) {
   const { detect, ready, classifier } = usePlantDetector(capturedImage);
@@ -19,7 +20,12 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
               mostConfidentResult = result;
             }
           });
-          setPlant(mostConfidentResult);
+          if (mostConfidentResult) {
+            const plantDetails = fetchPlantInfo(
+              mostConfidentResult.label
+            );
+            setPlant(plantDetails);
+          }
         }
       })();
     }
@@ -41,6 +47,21 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
         )}
         {plant.description && (
           <p className="plant-description">{plant.description}</p>
+        )}
+        {plant.light && (
+          <p>
+            <strong>Light:</strong> {plant.light}
+          </p>
+        )}
+        {plant.water && (
+          <p>
+            <strong>Water:</strong> {plant.water}
+          </p>
+        )}
+        {plant.uses && (
+          <p>
+            <strong>Uses:</strong> {plant.uses}
+          </p>
         )}
         {plant.confidence && (
           <p className="plant-confidence">
