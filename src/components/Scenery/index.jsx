@@ -34,18 +34,17 @@ const PlantScenery = () => {
     sunX = 0;
   };
 
-  const draw = (p5) => {
-    drawSky(p5);
-    drawSun(p5);
-    drawMountains(p5);
-    drawGround(p5);
-    drawClouds(p5);
-    drawBirds(p5);
-    drawTrees(p5);
-    drawWind(p5);
-
-    sunX += 0.2;
-    if (sunX > p5.width) sunX = 0;
+  const drawTooltip = (x, y, msg, p5) => {
+    p5.textSize(16);
+    let w = p5.textWidth(msg) + 24;
+    let h = 30;
+    let tx = p5.constrain(x + 25, 20, p5.width - w - 20);
+    let ty = p5.constrain(y - 25, 20, p5.height - h - 20);
+    // Text
+    p5.fill(255);
+    p5.noStroke();
+    p5.textAlign(p5.CENTER, p5.CENTER);
+    p5.text(msg, tx + w / 2, ty + h / 2);
   };
 
   const drawSky = (p5) => {
@@ -210,6 +209,21 @@ const PlantScenery = () => {
 
   const windowResized = (p5) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+  };
+
+  const draw = (p5) => {
+    drawSky(p5);
+    drawSun(p5);
+    drawMountains(p5);
+    drawGround(p5);
+    drawClouds(p5);
+    drawBirds(p5);
+    drawTrees(p5);
+    drawWind(p5);
+    drawTooltip(400, 500, "Tap on the grass for some fun!", p5);
+
+    sunX += 0.2;
+    if (sunX > p5.width) sunX = 0;
   };
 
   return (
