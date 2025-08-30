@@ -3,7 +3,7 @@ import Sketch from "react-p5";
 
 const PlantScenery = () => {
   const [isDay, setIsDay] = useState(true);
-  const [trees, setTrees] = useState([{ x: 400, y: 500, len: 100 }]);
+  const [trees, setTrees] = useState([]);
   let t = 0;
   let sunX = 0;
   let clouds = [];
@@ -12,6 +12,17 @@ const PlantScenery = () => {
   const setup = (p5, canvasParentRef) => {
     p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
     p5.angleMode(p5.DEGREES);
+
+    // Add initial trees positioned on the ground
+    const initialTrees = [];
+    for (let i = 0; i < 3; i++) {
+      initialTrees.push({
+        x: p5.random(p5.width * 0.2, p5.width * 0.8),
+        y: p5.height - 150, // Ground level
+        len: p5.random(80, 120),
+      });
+    }
+    setTrees(initialTrees);
 
     // initial clouds
     for (let i = 0; i < 5; i++) {
@@ -194,7 +205,7 @@ const PlantScenery = () => {
         ...prev,
         {
           x: p5.mouseX,
-          y: p5.mouseY,
+          y: p5.height - 150, // Position trees at ground level
           len: p5.random(80, 120),
         },
       ]);
@@ -220,7 +231,7 @@ const PlantScenery = () => {
     drawBirds(p5);
     drawTrees(p5);
     drawWind(p5);
-    drawTooltip(400, 500, "Tap on the grass for some fun!", p5);
+    drawTooltip(p5.width / 2, p5.height - 100, "Tap on the grass to plant trees!", p5);
 
     sunX += 0.2;
     if (sunX > p5.width) sunX = 0;

@@ -1,13 +1,30 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import usePlantDetector from "../../helpers/plantDetector";
 import "./styles.css";
 import { fetchPlantInfo } from "../../helpers/fetchPlantInfo";
+import LoadingSpinner from "../common/LoadingSpinner";
+import { usePlantStore } from "../../stores/plantStore";
+import { PlantDetails } from "../../types/plant";
 
-function DetectedPlantInfo({ capturedImage, closeDialog }) {
+interface DetectedPlantInfoProps {
+  capturedImage: string;
+  closeDialog: () => void;
+}
+
+const DetectedPlantInfo: React.FC<DetectedPlantInfoProps> = ({ capturedImage, closeDialog }) => {
   const { detect, ready, classifiers, loading, error, modelCount } = usePlantDetector();
-  const [plant, setPlant] = useState(null);
+  const [plant, setPlant] = useState<PlantDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [detectionError, setDetectionError] = useState(null);
+  const [detectionError, setDetectionError] = useState<string | null>(null);
+  
+  const { 
+    setCurrentPlant, 
+    addToHistory, 
+    setDetecting, 
+    setDetectionProgress, 
+    setDetectionStep,
+    preferences 
+  } = usePlantStore();
 
   useEffect(() => {
     if (ready && capturedImage) {
@@ -15,20 +32,31 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
         try {
           setIsLoading(true);
           setDetectionError(null);
+          setDetecting(true);
+          setDetectionStep('Analyzing image with AI models...');
+          setDetectionProgress(10);
           
           // First, try ML5 detection
           const mlResults = await detect(capturedImage, classifiers);
+          setDetectionProgress(40);
+          setDetectionStep('Identifying plant species...');
           
           let bestMlResult = null;
           if (mlResults.length > 0) {
             bestMlResult = mlResults[0]; // Already sorted by confidence
           }
           
+          setDetectionProgress(60);
+          setDetectionStep('Fetching detailed plant information...');
+          
           // Then get detailed plant info using both ML result and image
           const plantDetails = await fetchPlantInfo(
             bestMlResult?.label || 'Unknown Plant',
             capturedImage
           );
+          
+          setDetectionProgress(90);
+          setDetectionStep('Finalizing results...');
           
           // Combine ML5 confidence with API result
           if (plantDetails && bestMlResult) {
@@ -40,23 +68,37 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
           }
           
           setPlant(plantDetails);
+          setCurrentPlant(plantDetails);
+          setDetectionProgress(100);
+          
+          // Auto-save to history if enabled
+          if (preferences.autoSave && plantDetails) {
+            addToHistory(plantDetails, capturedImage);
+          }
+          
         } catch (err) {
           console.error('Plant detection failed:', err);
-          setDetectionError(err.message);
+          setDetectionError(err instanceof Error ? err.message : 'Detection failed');
           
           // Try to get fallback info
           try {
             const fallbackInfo = await fetchPlantInfo('Unknown Plant');
             setPlant(fallbackInfo);
+            setCurrentPlant(fallbackInfo);
           } catch (fallbackErr) {
             console.error('Fallback also failed:', fallbackErr);
           }
         } finally {
           setIsLoading(false);
+          setDetecting(false);
+          setDetectionProgress(0);
+          setDetectionStep('');
         }
       })();
     }
-  }, [ready, capturedImage, detect, classifiers]);
+  }, [ready, capturedImage, detect, classifiers, setCurrentPlant, addToHistory, preferences.autoSave, setDetecting, setDetectionProgress, setDetectionStep]);
+
+  const { detectionState } = usePlantStore();
 
   // Loading state
   if (loading || isLoading) {
@@ -66,16 +108,15 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
           <span className="plant-info-dialog-close" onClick={closeDialog}>
             ×
           </span>
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <h2>Analyzing Plant...</h2>
-            <p>
-              {loading ? 'Loading AI models...' : 'Identifying plant species and gathering information...'}
-            </p>
-            {modelCount > 0 && (
-              <p className="model-info">Using {modelCount} AI model{modelCount > 1 ? 's' : ''}</p>
-            )}
-          </div>
+          <LoadingSpinner
+            size="large"
+            message={loading ? 'Loading AI models...' : 'Analyzing Plant...'}
+            progress={detectionState.progress}
+            step={detectionState.currentStep}
+          />
+          {modelCount > 0 && (
+            <p className="model-info">Using {modelCount} AI model{modelCount > 1 ? 's' : ''}</p>
+          )}
         </div>
       </div>
     );
@@ -163,7 +204,8 @@ function DetectedPlantInfo({ capturedImage, closeDialog }) {
               src={plant.image}
               alt={plant.label}
               onError={(e) => {
-                e.target.style.display = 'none';
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
               }}
             />
           </div>

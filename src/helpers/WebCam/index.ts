@@ -1,10 +1,13 @@
 class Webcam {
-  constructor(webcamElement, canvasElement) {
+  webcamElement: HTMLVideoElement;
+  canvasElement: HTMLCanvasElement;
+
+  constructor(webcamElement: HTMLVideoElement, canvasElement: HTMLCanvasElement) {
     this.webcamElement = webcamElement;
     this.canvasElement = canvasElement;
   }
 
-  adjustVideoSize = (width, height) => {
+  adjustVideoSize = (width: number, height: number) => {
     const aspectRatio = width / height;
     if (width >= height) {
       this.webcamElement.width = aspectRatio * this.webcamElement.height;
@@ -13,8 +16,8 @@ class Webcam {
     }
   };
 
-  setup = async () => {
-    return new Promise((resolve, reject) => {
+  setup = async (): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
       if (navigator.mediaDevices.getUserMedia !== undefined) {
         navigator.mediaDevices
           .getUserMedia({
@@ -26,7 +29,7 @@ class Webcam {
               this.webcamElement.srcObject = mediaStream;
             } else {
               // For older browsers without the srcObject.
-              this.webcamElement.src = window.URL.createObjectURL(mediaStream);
+              (this.webcamElement as any).src = (window.URL as any).createObjectURL(mediaStream);
             }
             this.webcamElement.addEventListener(
               "loadeddata",
@@ -51,6 +54,10 @@ class Webcam {
     const imageHeight = this.webcamElement.videoHeight;
 
     const context = this.canvasElement.getContext("2d");
+    if (!context) {
+      throw new Error("Could not get 2D context from canvas");
+    }
+    
     this.canvasElement.width = imageWidth;
     this.canvasElement.height = imageHeight;
 
@@ -58,7 +65,7 @@ class Webcam {
     return { imageHeight, imageWidth };
   };
 
-  takeBlobPhoto = () => {
+  takeBlobPhoto = (): Promise<{ blob: Blob | null; imageHeight: number; imageWidth: number }> => {
     const { imageWidth, imageHeight } = this._drawImage();
     return new Promise((resolve, reject) => {
       this.canvasElement.toBlob((blob) => {
@@ -67,7 +74,7 @@ class Webcam {
     });
   };
 
-  takeBase64Photo = ({ type, quality } = { type: "png", quality: 1 }) => {
+  takeBase64Photo = ({ type, quality }: { type?: string; quality?: number } = { type: "png", quality: 1 }): { base64: string; imageHeight: number; imageWidth: number } => {
     const { imageHeight, imageWidth } = this._drawImage();
     const base64 = this.canvasElement.toDataURL("image/" + type, quality);
     return { base64, imageHeight, imageWidth };

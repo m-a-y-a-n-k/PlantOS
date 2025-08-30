@@ -1,5 +1,12 @@
+import { PlantDetails, ApiKeys, BaseUrls, CachedData } from '../types/plant';
+
 // Enhanced Plant API Service with multiple providers
 class PlantApiService {
+  private apiKeys: ApiKeys;
+  private baseUrls: BaseUrls;
+  private cache: Map<string, CachedData<any>>;
+  private cacheTimeout: number;
+
   constructor() {
     this.apiKeys = {
       plantId: process.env.REACT_APP_PLANT_ID_API_KEY,
@@ -19,7 +26,7 @@ class PlantApiService {
   }
 
   // Convert base64 image to blob for API upload
-  base64ToBlob(base64String) {
+  base64ToBlob(base64String: string): Blob {
     const byteCharacters = atob(base64String.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);
     
@@ -32,7 +39,7 @@ class PlantApiService {
   }
 
   // Plant.id API - Most accurate for plant identification
-  async identifyWithPlantId(base64Image) {
+  async identifyWithPlantId(base64Image: string): Promise<PlantDetails | null> {
     if (!this.apiKeys.plantId) {
       throw new Error('Plant.id API key not configured');
     }
@@ -73,7 +80,7 @@ class PlantApiService {
   }
 
   // Perenual API - Good for plant care information
-  async getPlantCareInfo(plantName) {
+  async getPlantCareInfo(plantName: string): Promise<PlantDetails | null> {
     if (!this.apiKeys.perenual) {
       console.warn('Perenual API key not configured, using fallback data');
       return this.getFallbackPlantInfo(plantName);
@@ -117,7 +124,7 @@ class PlantApiService {
   }
 
   // PlantNet API - Open source plant identification
-  async identifyWithPlantNet(base64Image) {
+  async identifyWithPlantNet(base64Image: string): Promise<PlantDetails | null> {
     if (!this.apiKeys.plantNet) {
       throw new Error('PlantNet API key not configured');
     }
@@ -151,7 +158,7 @@ class PlantApiService {
   }
 
   // Main identification method that tries multiple APIs
-  async identifyPlant(base64Image, plantLabel = null) {
+  async identifyPlant(base64Image: string, plantLabel: string | null = null): Promise<PlantDetails | null> {
     const results = [];
 
     // Try Plant.id first (most accurate)
@@ -195,7 +202,7 @@ class PlantApiService {
   }
 
   // Format Plant.id API response
-  formatPlantIdResponse(data) {
+  formatPlantIdResponse(data: any): PlantDetails | null {
     if (!data.suggestions || data.suggestions.length === 0) {
       return null;
     }
@@ -218,12 +225,13 @@ class PlantApiService {
       image: plant.image?.value,
       gbifId: plant.gbif_id,
       inaturalistId: plant.inaturalist_id,
-      synonyms: plant.synonyms || []
+      synonyms: plant.synonyms || [],
+      source: 'Plant.id'
     };
   }
 
   // Format PlantNet API response
-  formatPlantNetResponse(data) {
+  formatPlantNetResponse(data: any): PlantDetails | null {
     if (!data.results || data.results.length === 0) {
       return null;
     }
@@ -238,18 +246,21 @@ class PlantApiService {
       description: `${species.genus.scientificNameWithoutAuthor} species`,
       family: species.family.scientificNameWithoutAuthor,
       genus: species.genus.scientificNameWithoutAuthor,
-      images: result.images?.map(img => img.url.o) || []
+      images: result.images?.map((img: any) => img.url.o) || [],
+      source: 'PlantNet'
     };
   }
 
   // Format Perenual API response
-  formatPerenualResponse(data) {
+  formatPerenualResponse(data: any): PlantDetails {
     return {
       label: data.common_name || data.scientific_name?.[0],
       scientificName: data.scientific_name?.[0],
+      confidence: 0.7,
       description: data.description || 'No description available',
       watering: data.watering || 'Regular watering',
       light: data.sunlight?.join(', ') || 'Bright indirect light',
+      source: 'Perenual',
       care: {
         hardiness: data.hardiness?.min && data.hardiness?.max 
           ? `Zones ${data.hardiness.min}-${data.hardiness.max}` 
@@ -284,34 +295,31 @@ class PlantApiService {
   }
 
   // Fallback plant information when APIs fail
-  getFallbackPlantInfo(plantName) {
-    const fallbackData = {
+  getFallbackPlantInfo(plantName: string): PlantDetails {
+    const fallbackData: Record<string, Partial<PlantDetails>> = {
       'daisy': {
         label: 'Daisy',
         scientificName: 'Bellis perennis',
         description: 'A common flowering plant with white petals and yellow center.',
         light: 'Full sun to partial shade',
-        water: 'Regular watering, allow soil to dry between waterings',
-        uses: 'Ornamental, medicinal (traditional use)',
-        care: 'Easy to grow, low maintenance'
+        watering: 'Regular watering, allow soil to dry between waterings',
+        uses: 'Ornamental, medicinal (traditional use)'
       },
       'rose': {
         label: 'Rose',
         scientificName: 'Rosa spp.',
         description: 'Popular flowering shrub known for its fragrant blooms.',
         light: 'Full sun (6+ hours daily)',
-        water: 'Deep watering 1-2 times per week',
-        uses: 'Ornamental, cut flowers, essential oils',
-        care: 'Regular pruning, fertilizing, and pest management'
+        watering: 'Deep watering 1-2 times per week',
+        uses: 'Ornamental, cut flowers, essential oils'
       },
       'sunflower': {
         label: 'Sunflower',
         scientificName: 'Helianthus annuus',
         description: 'Large flowering plant that follows the sun across the sky.',
         light: 'Full sun',
-        water: 'Regular watering, drought tolerant when established',
-        uses: 'Seeds for food and oil, ornamental',
-        care: 'Support tall varieties, deadhead spent flowers'
+        watering: 'Regular watering, drought tolerant when established',
+        uses: 'Seeds for food and oil, ornamental'
       }
     };
 
@@ -320,7 +328,11 @@ class PlantApiService {
     // Try to find a match in fallback data
     for (const [key, data] of Object.entries(fallbackData)) {
       if (normalizedName.includes(key) || key.includes(normalizedName)) {
-        return { ...data, confidence: 0.5, source: 'Fallback' };
+        return { 
+          confidence: 0.5, 
+          source: 'Fallback',
+          ...data
+        } as PlantDetails;
       }
     }
 
@@ -330,16 +342,15 @@ class PlantApiService {
       scientificName: 'Species not identified',
       description: 'This appears to be a plant, but we could not identify the specific species. Consider consulting a local botanist or plant identification expert.',
       light: 'Varies by species - observe current growing conditions',
-      water: 'Monitor soil moisture - most plants prefer soil that dries slightly between waterings',
+      watering: 'Monitor soil moisture - most plants prefer soil that dries slightly between waterings',
       uses: 'Unknown - research before consumption or medicinal use',
-      care: 'Provide appropriate light, water, and nutrients based on plant type',
       confidence: 0.1,
       source: 'Generic Fallback'
     };
   }
 
   // Cache management
-  getCachedData(key) {
+  getCachedData(key: string): any {
     const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
       return cached.data;
@@ -347,14 +358,14 @@ class PlantApiService {
     return null;
   }
 
-  setCachedData(key, data) {
+  setCachedData(key: string, data: any): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now()
     });
   }
 
-  clearCache() {
+  clearCache(): void {
     this.cache.clear();
   }
 }

@@ -1,0 +1,200 @@
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.loading-spinner--small {
+  padding: 1rem;
+}
+
+.loading-spinner--large {
+  padding: 3rem;
+  min-height: 300px;
+}
+
+.spinner-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.plant-spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  animation: gentle-sway 3s ease-in-out infinite;
+}
+
+.loading-spinner--small .plant-spinner {
+  width: 40px;
+  height: 40px;
+}
+
+.loading-spinner--large .plant-spinner {
+  width: 120px;
+  height: 120px;
+}
+
+.leaf {
+  position: absolute;
+  font-size: 2rem;
+  animation: leaf-dance 2s ease-in-out infinite;
+}
+
+.loading-spinner--small .leaf {
+  font-size: 1rem;
+}
+
+.loading-spinner--large .leaf {
+  font-size: 3rem;
+}
+
+.leaf-1 {
+  top: 10px;
+  left: 20px;
+  animation-delay: 0s;
+  transform-origin: bottom center;
+}
+
+.leaf-2 {
+  top: 20px;
+  right: 15px;
+  animation-delay: 0.5s;
+  transform-origin: bottom center;
+}
+
+.leaf-3 {
+  top: 30px;
+  left: 10px;
+  animation-delay: 1s;
+  transform-origin: bottom center;
+}
+
+.stem {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  animation: stem-grow 2s ease-in-out infinite;
+}
+
+.loading-spinner--small .stem {
+  font-size: 1.25rem;
+}
+
+.loading-spinner--large .stem {
+  font-size: 3.75rem;
+}
+
+.loading-text h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.loading-spinner--small .loading-text h3 {
+  font-size: 1rem;
+}
+
+.loading-spinner--large .loading-text h3 {
+  font-size: 1.5rem;
+}
+
+.loading-step {
+  margin: 0 0 1rem 0;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #ecf0f1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  animation: progress-shimmer 2s ease-in-out infinite;
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  color: #2c3e50;
+  font-weight: 500;
+  min-width: 40px;
+}
+
+/* Animations */
+@keyframes gentle-sway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes leaf-dance {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(5deg) scale(0.95);
+  }
+}
+
+@keyframes stem-grow {
+  0%, 100% {
+    transform: translateX(-50%) scaleY(1);
+  }
+  50% {
+    transform: translateX(-50%) scaleY(1.1);
+  }
+}
+
+@keyframes progress-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .loading-spinner {
+    padding: 1.5rem;
+  }
+  
+  .progress-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .progress-bar {
+    width: 100%;
+  }
+}

@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react';
-/* global ml5 */
+import { MLResult } from '../types/plant';
+
+// Declare ml5 global
+declare global {
+  interface Window {
+    ml5: any;
+  }
+}
+
+const ml5 = (window as any).ml5;
 
 // Image preprocessing for better plant detection
-function preprocessImage(imageElement) {
+function preprocessImage(imageElement: HTMLImageElement): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d')!;
   
   // Set canvas size to model input requirements
   canvas.width = 224;
@@ -39,7 +48,7 @@ function preprocessImage(imageElement) {
 }
 
 // Enhanced detection with multiple models
-async function detect(base64, classifiers) {
+async function detect(base64: string, classifiers: any): Promise<MLResult[]> {
   const img = new Image();
   img.src = base64;
   await img.decode();
@@ -53,7 +62,7 @@ async function detect(base64, classifiers) {
   if (classifiers.mobilenet) {
     try {
       const mobileNetResults = await classifiers.mobilenet.classify(processedCanvas);
-      results.push(...mobileNetResults.map(r => ({ ...r, model: 'MobileNet' })));
+      results.push(...mobileNetResults.map((r: any) => ({ ...r, model: 'MobileNet' })));
     } catch (error) {
       console.warn('MobileNet classification failed:', error);
     }
@@ -63,7 +72,7 @@ async function detect(base64, classifiers) {
   if (classifiers.densenet) {
     try {
       const denseNetResults = await classifiers.densenet.classify(processedCanvas);
-      results.push(...denseNetResults.map(r => ({ ...r, model: 'DenseNet' })));
+      results.push(...denseNetResults.map((r: any) => ({ ...r, model: 'DenseNet' })));
     } catch (error) {
       console.warn('DenseNet classification failed:', error);
     }
@@ -76,19 +85,19 @@ async function detect(base64, classifiers) {
     'petal', 'stem', 'root', 'seed', 'fruit', 'vegetable', 'crop'
   ];
   
-  const plantResults = results.filter(result => 
-    plantKeywords.some(keyword => 
+  const plantResults = results.filter((result: any) => 
+    plantKeywords.some((keyword: string) => 
       result.label.toLowerCase().includes(keyword)
     )
   );
   
   // If we found plant-specific results, prioritize them
   if (plantResults.length > 0) {
-    return plantResults.sort((a, b) => b.confidence - a.confidence);
+    return plantResults.sort((a: any, b: any) => b.confidence - a.confidence);
   }
   
   // Otherwise return all results sorted by confidence
-  return results.sort((a, b) => b.confidence - a.confidence);
+  return results.sort((a: any, b: any) => b.confidence - a.confidence);
 }
 
 // Enhanced plant detector hook with multiple models
@@ -98,7 +107,7 @@ export default function usePlantDetector() {
     densenet: null
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const initializeModels = async () => {
@@ -123,7 +132,7 @@ export default function usePlantDetector() {
         
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : 'Failed to load AI models');
         setLoading(false);
       }
     };

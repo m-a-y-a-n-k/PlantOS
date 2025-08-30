@@ -1,44 +1,78 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Webcam from "../../helpers/WebCam";
 import "./styles.css";
 import DetectedPlantInfo from "../DetectedPlantInfo";
+import LoadingSpinner from "../common/LoadingSpinner";
+import { usePlantStore } from "../../stores/plantStore";
 
-const Canvas = ({ offline }) => {
-  const [capturedImage, setCapturedImage] = useState(null);
+interface CanvasProps {
+  offline: boolean;
+}
+
+const Canvas: React.FC<CanvasProps> = ({ offline }) => {
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [captured, setCaptured] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showDetectedPlantInfo, setShowDetectedPlantInfo] = useState(false);
+  
+  const { 
+    addToHistory, 
+    currentPlant, 
+    setCurrentPlant,
+    setCameraActive,
+    setCameraError,
+    preferences 
+  } = usePlantStore();
 
-  const webcamRef = useRef(null);
-  const webcam = useRef(null);
+  const webcamRef = useRef<HTMLVideoElement>(null);
+  const webcam = useRef<Webcam | null>(null);
 
   const captureImage = async () => {
-    const capturedData = webcam.current.takeBase64Photo({
-      type: "jpeg",
-      quality: 2,
-    });
-    setCaptured(true);
-    setCapturedImage(capturedData.base64);
+    if (!webcam.current) return;
+    
+    try {
+      const capturedData = webcam.current.takeBase64Photo({
+        type: "jpeg",
+        quality: 2,
+      });
+      setCaptured(true);
+      setCapturedImage(capturedData.base64);
+      
+      // Auto-save to history if enabled
+      if (preferences.autoSave && currentPlant) {
+        addToHistory(currentPlant, capturedData.base64);
+      }
+    } catch (error) {
+      console.error('Failed to capture image:', error);
+      setCameraError('Failed to capture image. Please try again.');
+    }
   };
   const discardImage = useCallback(() => {
     setCaptured(false);
     setCapturedImage(null);
-  }, []);
+    setCurrentPlant(null);
+  }, [setCurrentPlant]);
 
   const checkUploadStatus = useCallback(
-    (data) => {
+    (data: { status: number }) => {
       setUploading(false);
       if (data.status === 200) {
-        alert("Image Uploaded to Library");
+        // Save to history when uploading
+        if (currentPlant && capturedImage) {
+          addToHistory(currentPlant, capturedImage);
+        }
+        alert("Plant saved to your collection!");
         discardImage();
       } else {
-        alert("Sorry, we encountered an error uploading your image");
+        alert("Sorry, we encountered an error saving your plant");
       }
     },
-    [setUploading, discardImage]
+    [setUploading, discardImage, currentPlant, capturedImage, addToHistory]
   );
 
   const uploadImage = () => {
+    if (!capturedImage) return;
+    
     if (offline) {
       const prefix = "cloudy_pwa_";
       const rs = Math.random().toString(36).substring(2, 5);
@@ -54,11 +88,11 @@ const Canvas = ({ offline }) => {
     }
   };
 
-  const findLocalItems = (query) => {
-    let results = [];
-    for (let i in localStorage) {
+  const findLocalItems = (query: RegExp) => {
+    const results: Array<{ key: string; val: string | null }> = [];
+    for (const i in localStorage) {
       if (localStorage.hasOwnProperty(i)) {
-        if (i.match(query) || (!query && typeof i === "string")) {
+        if (i.match(query)) {
           const value = localStorage.getItem(i);
           localStorage.removeItem(i);
           results.push({ key: i, val: value });
@@ -81,7 +115,7 @@ const Canvas = ({ offline }) => {
         Scan Another
       </button>
       <button className="uploadButton" onClick={uploadImage}>
-        Upload Plant
+        💾 Save Plant
       </button>
       <button
         className="infoButton"
@@ -97,20 +131,30 @@ const Canvas = ({ offline }) => {
   );
 
   const uploadingMessage = uploading ? (
-    <div>
-      <p>Uploading Image, please wait ...</p>
-    </div>
+    <LoadingSpinner 
+      message="Saving plant to your collection..."
+      size="small"
+    />
   ) : null;
 
   useEffect(() => {
     // Initialize the camera
     const canvasElement = document.createElement("canvas");
-    webcam.current = new Webcam(webcamRef.current, canvasElement);
+    if (webcamRef.current) {
+      webcam.current = new Webcam(webcamRef.current, canvasElement);
 
-    webcam.current.setup().catch(() => {
-      alert("Error getting access to your camera");
-    });
-  }, []);
+      webcam.current.setup()
+        .then(() => {
+          setCameraActive(true);
+          setCameraError(null);
+        })
+        .catch((error) => {
+          console.error('Camera setup failed:', error);
+          setCameraError("Error getting access to your camera. Please check permissions.");
+          setCameraActive(false);
+        });
+    }
+  }, [setCameraActive, setCameraError]);
 
   useEffect(() => {
     const batchUploads = () => {

@@ -1,7 +1,8 @@
 import plantApiService from './plantApiService';
+import { PlantDetails } from '../types/plant';
 
 // Enhanced plant information fetcher with multiple API sources
-export async function fetchPlantInfo(plantLabel, capturedImage = null) {
+export async function fetchPlantInfo(plantLabel: string, capturedImage: string | null = null): Promise<PlantDetails | null> {
   try {
     // If we have a captured image, use it for better identification
     if (capturedImage) {
@@ -22,7 +23,7 @@ export async function fetchPlantInfo(plantLabel, capturedImage = null) {
 }
 
 // Legacy function for backward compatibility
-export async function fetchPlantInfoLegacy(plantLabel) {
+export async function fetchPlantInfoLegacy(plantLabel: string): Promise<PlantDetails | null> {
   try {
     // Try the old Trefle API approach as a fallback
     const token = await getToken();
@@ -46,6 +47,7 @@ export async function fetchPlantInfoLegacy(plantLabel) {
       return {
         label: plant.common_name || plant.scientific_name,
         scientificName: plant.scientific_name,
+        confidence: 0.5,
         description: `${plant.family_common_name || plant.family} family plant`,
         family: plant.family,
         genus: plant.genus,
@@ -61,7 +63,7 @@ export async function fetchPlantInfoLegacy(plantLabel) {
   }
 }
 
-async function getToken() {
+async function getToken(): Promise<string> {
   const params = {
     origin: window.location.origin,
     token: process.env.REACT_APP_TREFLE_TOKEN,

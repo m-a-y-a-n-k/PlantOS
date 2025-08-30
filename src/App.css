@@ -58,13 +58,73 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .App-header {
-  padding: 8px;
+  padding: 20px;
   background: linear-gradient(25deg, #0b4a26e2, white);
   font-size: calc(1rem + 1vmin);
   color: white;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-content {
+  flex: 1;
+  text-align: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.history-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.history-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.offline-indicator {
+  background: #e74c3c;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.canvas-error,
+.scenery-error {
+  padding: 2rem;
+  text-align: center;
+  color: #7f8c8d;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem;
 }
 
 .App-link {
@@ -118,4 +178,25 @@ button:hover {
   justify-content: center;
   align-items: center;
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .App-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-content {
+    order: 1;
+  }
+  
+  .header-actions {
+    order: 2;
+    justify-content: center;
+  }
+  
+  .App-logo {
+    order: 0;
+    margin-bottom: 1rem;
+  }
 }
