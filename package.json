@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "version": "0.1.0",
+  "name": "plantos",
+  "version": "1.0.0",
   "private": true,
   "homepage": "https://m-a-y-a-n-k.github.io/PlantOS/",
   "proxy": "http://localhost:3000",
