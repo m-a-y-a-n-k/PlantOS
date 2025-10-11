@@ -81,7 +81,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .history-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(17 87 19 / 51%); 
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   padding: 0.5rem 1rem;
