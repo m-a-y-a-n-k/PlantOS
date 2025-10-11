@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Webcam from "../../helpers/WebCam";
 import "./styles.css";
-import DetectedPlantInfo from "../DetectedPlantInfo";
+import DetectedPlantInfo from "../../components/DetectedPlantInfo";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { usePlantStore } from "../../stores/plantStore";
+import AlertBox from "../common/AlertBox";
 
 interface CanvasProps {
   offline: boolean;
@@ -14,6 +15,7 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
   const [captured, setCaptured] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showDetectedPlantInfo, setShowDetectedPlantInfo] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   
   const { 
     addToHistory, 
@@ -61,10 +63,10 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
         if (currentPlant && capturedImage) {
           addToHistory(currentPlant, capturedImage);
         }
-        alert("Plant saved to your collection!");
+        setAlertMessage("Plant saved to your collection!");
         discardImage();
       } else {
-        alert("Sorry, we encountered an error saving your plant");
+        setAlertMessage("Sorry, we encountered an error saving your plant");
       }
     },
     [setUploading, discardImage, currentPlant, capturedImage, addToHistory]
@@ -77,7 +79,7 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
       const prefix = "cloudy_pwa_";
       const rs = Math.random().toString(36).substring(2, 5);
       localStorage.setItem(`${prefix}${rs}`, capturedImage);
-      alert(
+      setAlertMessage(
         "Image saved locally, it will be uploaded to your library once internet connection is detected"
       );
       discardImage();
@@ -168,7 +170,7 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
         });
         setUploading(false);
         if (!error) {
-          alert("All saved images have been uploaded to your Library");
+          setAlertMessage("All saved images have been uploaded to your Library");
         }
       }
     };
@@ -201,6 +203,13 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
         <DetectedPlantInfo
           capturedImage={capturedImage}
           closeDialog={() => setShowDetectedPlantInfo(false)}
+        />
+      )}
+      {alertMessage && (
+        <AlertBox
+          type="info"
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
         />
       )}
     </div>
