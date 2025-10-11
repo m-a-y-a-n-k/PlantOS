@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import "./App.css";
 import leaf from "./healthy.jpg";
 import { usePlantStore } from "./stores/plantStore";
 import ErrorBoundary from "./components/common/ErrorBoundary";
-import Canvas from "./components/Canvas";
-import PlantScenery from "./components/Scenery";
-import PlantHistory from "./components/plant/PlantHistory";
+import LoadingSpinner from "./components/common/LoadingSpinner";
+
+// Lazy load components for better performance
+const Canvas = lazy(() => import("./components/Canvas"));
+const PlantScenery = lazy(() => import("./components/Scenery"));
+const PlantHistory = lazy(() => import("./components/plant/PlantHistory"));
 
 const App: React.FC = () => {
   const { appState, setOffline } = usePlantStore();
@@ -61,7 +64,9 @@ const App: React.FC = () => {
               <p>Camera component failed to load. Please refresh the page.</p>
             </div>
           }>
-            <Canvas offline={appState.offline} />
+            <Suspense fallback={<LoadingSpinner message="Loading camera..." />}>
+              <Canvas offline={appState.offline} />
+            </Suspense>
           </ErrorBoundary>
         </main>
         <footer className="App-footer">
@@ -70,18 +75,22 @@ const App: React.FC = () => {
               <p>Interactive scenery is temporarily unavailable.</p>
             </div>
           }>
-            <PlantScenery />
+            <Suspense fallback={<LoadingSpinner message="Loading scenery..." />}>
+              <PlantScenery />
+            </Suspense>
           </ErrorBoundary>
         </footer>
         
         {showHistory && (
-          <PlantHistory 
-            onClose={() => setShowHistory(false)}
-            onSelectPlant={(plant) => {
-              console.log('Selected plant:', plant);
-              // Could open detailed view here
-            }}
-          />
+          <Suspense fallback={<LoadingSpinner message="Loading plant history..." />}>
+            <PlantHistory 
+              onClose={() => setShowHistory(false)}
+              onSelectPlant={(plant) => {
+                console.log('Selected plant:', plant);
+                // Could open detailed view here
+              }}
+            />
+          </Suspense>
         )}
       </div>
     </ErrorBoundary>

@@ -162,10 +162,40 @@ export const usePlantStore = create<PlantStore>()(
   )
 );
 
-// Selectors for better performance
+// Optimized selectors for better performance
 export const useAppState = () => usePlantStore((state) => state.appState);
 export const useCameraState = () => usePlantStore((state) => state.cameraState);
 export const useDetectionState = () => usePlantStore((state) => state.detectionState);
 export const useCurrentPlant = () => usePlantStore((state) => state.currentPlant);
 export const usePlantHistory = () => usePlantStore((state) => state.plantHistory);
 export const usePreferences = () => usePlantStore((state) => state.preferences);
+
+// More specific selectors to prevent unnecessary re-renders
+export const useOfflineStatus = () => usePlantStore((state) => state.appState.offline);
+export const useLoadingStatus = () => usePlantStore((state) => state.appState.loading);
+export const useErrorStatus = () => usePlantStore((state) => state.appState.error);
+export const useCameraActive = () => usePlantStore((state) => state.cameraState.isActive);
+export const useCameraError = () => usePlantStore((state) => state.cameraState.error);
+export const useAutoSavePreference = () => usePlantStore((state) => state.preferences.autoSave);
+
+// Action selectors
+export const usePlantActions = () => usePlantStore((state) => ({
+  addToHistory: state.addToHistory,
+  removeFromHistory: state.removeFromHistory,
+  toggleFavorite: state.toggleFavorite,
+  addNoteToPlant: state.addNoteToPlant,
+  clearHistory: state.clearHistory,
+  setCurrentPlant: state.setCurrentPlant,
+}));
+
+export const useAppActions = () => usePlantStore((state) => ({
+  setOffline: state.setOffline,
+  setLoading: state.setLoading,
+  setError: state.setError,
+}));
+
+export const useCameraActions = () => usePlantStore((state) => ({
+  setCameraActive: state.setCameraActive,
+  setCameraPermission: state.setCameraPermission,
+  setCameraError: state.setCameraError,
+}));

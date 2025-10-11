@@ -1,0 +1,119 @@
+/* Optimized Image Component Styles */
+.optimized-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+.optimized-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.optimized-image-container.loading .optimized-image {
+  opacity: 0;
+}
+
+.optimized-image-container.loaded .optimized-image {
+  opacity: 1;
+}
+
+.optimized-image-container.error .optimized-image {
+  opacity: 0.3;
+}
+
+/* Loading Overlay */
+.image-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 245, 245, 0.9);
+  z-index: 1;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e0e0e0;
+  border-top: 2px solid #4caf50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Overlay */
+.image-error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  color: #666;
+  z-index: 1;
+}
+
+.image-error-overlay span {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.image-error-overlay p {
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Hover Effects */
+.optimized-image-container:hover .optimized-image {
+  transform: scale(1.02);
+}
+
+.optimized-image-container {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.optimized-image-container:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .optimized-image-container {
+    min-height: 80px;
+  }
+  
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .image-error-overlay span {
+    font-size: 20px;
+  }
+  
+  .image-error-overlay p {
+    font-size: 11px;
+  }
+}

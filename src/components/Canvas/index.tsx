@@ -1,35 +1,37 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Webcam from "../../helpers/WebCam";
 import "./styles.css";
 import DetectedPlantInfo from "../../components/DetectedPlantInfo";
 import LoadingSpinner from "../common/LoadingSpinner";
-import { usePlantStore } from "../../stores/plantStore";
+import OptimizedImage from "../common/OptimizedImage";
+import { 
+  useCurrentPlant, 
+  useAutoSavePreference, 
+  usePlantActions, 
+  useCameraActions 
+} from "../../stores/plantStore";
 import AlertBox from "../common/AlertBox";
 
 interface CanvasProps {
   offline: boolean;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ offline }) => {
+const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [captured, setCaptured] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showDetectedPlantInfo, setShowDetectedPlantInfo] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   
-  const { 
-    addToHistory, 
-    currentPlant, 
-    setCurrentPlant,
-    setCameraActive,
-    setCameraError,
-    preferences 
-  } = usePlantStore();
+  const currentPlant = useCurrentPlant();
+  const autoSave = useAutoSavePreference();
+  const { addToHistory, setCurrentPlant } = usePlantActions();
+  const { setCameraActive, setCameraError } = useCameraActions();
 
   const webcamRef = useRef<HTMLVideoElement>(null);
   const webcam = useRef<Webcam | null>(null);
 
-  const captureImage = async () => {
+  const captureImage = useCallback(async () => {
     if (!webcam.current) return;
     
     try {
@@ -41,14 +43,14 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
       setCapturedImage(capturedData.base64);
       
       // Auto-save to history if enabled
-      if (preferences.autoSave && currentPlant) {
+      if (autoSave && currentPlant) {
         addToHistory(currentPlant, capturedData.base64);
       }
     } catch (error) {
       console.error('Failed to capture image:', error);
       setCameraError('Failed to capture image. Please try again.');
     }
-  };
+  }, [autoSave, currentPlant, addToHistory, setCameraError]);
   const discardImage = useCallback(() => {
     setCaptured(false);
     setCapturedImage(null);
@@ -72,7 +74,7 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
     [setUploading, discardImage, currentPlant, capturedImage, addToHistory]
   );
 
-  const uploadImage = () => {
+  const uploadImage = useCallback(() => {
     if (!capturedImage) return;
     
     if (offline) {
@@ -88,9 +90,9 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
       // Simulating upload
       checkUploadStatus({ status: 200 });
     }
-  };
+  }, [capturedImage, offline, discardImage, checkUploadStatus]);
 
-  const findLocalItems = (query: RegExp) => {
+  const findLocalItems = useCallback((query: RegExp) => {
     const results: Array<{ key: string; val: string | null }> = [];
     for (const i in localStorage) {
       if (localStorage.hasOwnProperty(i)) {
@@ -102,42 +104,58 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
       }
     }
     return results;
-  };
+  }, []);
 
-  const imageDisplay = capturedImage ? (
-    <img src={capturedImage} alt="captured" width="350" />
-  ) : null;
-
-  const buttons = captured ? (
-    <div className="button-group">
-      <button className="discardButton" onClick={discardImage}>
-        Discard Plant
-      </button>
-      <button className="captureButton" onClick={captureImage}>
-        Scan Another
-      </button>
-      <button className="uploadButton" onClick={uploadImage}>
-        💾 Save Plant
-      </button>
-      <button
-        className="infoButton"
-        onClick={() => setShowDetectedPlantInfo(true)}
-      >
-        Show Plant Info
-      </button>
-    </div>
-  ) : (
-    <button className="captureButton" onClick={captureImage}>
-      Scan Plant
-    </button>
+  const imageDisplay = useMemo(() => 
+    capturedImage ? (
+      <OptimizedImage 
+        src={capturedImage} 
+        alt="captured plant" 
+        width="350" 
+        height="275"
+        quality={0.7}
+        loading="eager"
+      />
+    ) : null, 
+    [capturedImage]
   );
 
-  const uploadingMessage = uploading ? (
-    <LoadingSpinner 
-      message="Saving plant to your collection..."
-      size="small"
-    />
-  ) : null;
+  const buttons = useMemo(() => 
+    captured ? (
+      <div className="button-group">
+        <button className="discardButton" onClick={discardImage}>
+          Discard Plant
+        </button>
+        <button className="captureButton" onClick={captureImage}>
+          Scan Another
+        </button>
+        <button className="uploadButton" onClick={uploadImage}>
+          💾 Save Plant
+        </button>
+        <button
+          className="infoButton"
+          onClick={() => setShowDetectedPlantInfo(true)}
+        >
+          Show Plant Info
+        </button>
+      </div>
+    ) : (
+      <button className="captureButton" onClick={captureImage}>
+        Scan Plant
+      </button>
+    ), 
+    [captured, discardImage, captureImage, uploadImage]
+  );
+
+  const uploadingMessage = useMemo(() => 
+    uploading ? (
+      <LoadingSpinner 
+        message="Saving plant to your collection..."
+        size="small"
+      />
+    ) : null,
+    [uploading]
+  );
 
   useEffect(() => {
     // Initialize the camera
@@ -177,7 +195,7 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
     if (!offline) {
       batchUploads();
     }
-  }, [offline, checkUploadStatus]);
+  }, [offline, checkUploadStatus, findLocalItems]);
 
   return (
     <div className="uploadCanvas">
@@ -214,6 +232,8 @@ const Canvas: React.FC<CanvasProps> = ({ offline }) => {
       )}
     </div>
   );
-};
+});
+
+Canvas.displayName = 'Canvas';
 
 export default Canvas;

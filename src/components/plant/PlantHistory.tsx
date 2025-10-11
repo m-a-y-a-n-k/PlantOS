@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { usePlantStore } from '../../stores/plantStore';
 import { PlantHistoryItem } from '../../types/plant';
+import OptimizedImage from '../common/OptimizedImage';
 import './PlantHistory.css';
 
 interface PlantHistoryProps {
@@ -8,34 +9,37 @@ interface PlantHistoryProps {
   onSelectPlant?: (plant: PlantHistoryItem) => void;
 }
 
-const PlantHistory: React.FC<PlantHistoryProps> = ({ onClose, onSelectPlant }) => {
+const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelectPlant }) => {
   const { plantHistory, removeFromHistory, toggleFavorite, addNoteToPlant } = usePlantStore();
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
 
-  const filteredHistory = plantHistory.filter((item) => {
-    const matchesFilter = filter === 'all' || (filter === 'favorites' && item.isFavorite);
-    const matchesSearch = searchTerm === '' || 
-      item.plant.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.plant.scientificName && item.plant.scientificName.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    return matchesFilter && matchesSearch;
-  });
+  const filteredHistory = useMemo(() => 
+    plantHistory.filter((item) => {
+      const matchesFilter = filter === 'all' || (filter === 'favorites' && item.isFavorite);
+      const matchesSearch = searchTerm === '' || 
+        item.plant.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.plant.scientificName && item.plant.scientificName.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      return matchesFilter && matchesSearch;
+    }), 
+    [plantHistory, filter, searchTerm]
+  );
 
-  const handleAddNote = (id: string) => {
+  const handleAddNote = useCallback((id: string) => {
     addNoteToPlant(id, noteText);
     setEditingNote(null);
     setNoteText('');
-  };
+  }, [addNoteToPlant, noteText]);
 
-  const startEditingNote = (item: PlantHistoryItem) => {
+  const startEditingNote = useCallback((item: PlantHistoryItem) => {
     setEditingNote(item.id);
     setNoteText(item.notes || '');
-  };
+  }, []);
 
-  const formatDate = (timestamp: number) => {
+  const formatDate = useCallback((timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -43,7 +47,7 @@ const PlantHistory: React.FC<PlantHistoryProps> = ({ onClose, onSelectPlant }) =
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
+  }, []);
 
   return (
     <div className="plant-history-overlay">
@@ -101,10 +105,12 @@ const PlantHistory: React.FC<PlantHistoryProps> = ({ onClose, onSelectPlant }) =
               {filteredHistory.map((item) => (
                 <div key={item.id} className="history-card">
                   <div className="card-image-container">
-                    <img
+                    <OptimizedImage
                       src={item.capturedImage}
                       alt={item.plant.label}
                       className="card-image"
+                      loading="lazy"
+                      quality={0.6}
                       onClick={() => onSelectPlant?.(item)}
                     />
                     <div className="card-actions">
@@ -199,6 +205,8 @@ const PlantHistory: React.FC<PlantHistoryProps> = ({ onClose, onSelectPlant }) =
       </div>
     </div>
   );
-};
+});
+
+PlantHistory.displayName = 'PlantHistory';
 
 export default PlantHistory;
