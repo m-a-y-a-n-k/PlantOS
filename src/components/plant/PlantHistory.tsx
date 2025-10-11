@@ -12,9 +12,9 @@ interface PlantHistoryProps {
 const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelectPlant }) => {
   const { plantHistory, removeFromHistory, toggleFavorite, addNoteToPlant } = usePlantStore();
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [editingNote, setEditingNote] = useState<string | null>(null);
-  const [noteText, setNoteText] = useState('');
+  const [noteText, setNoteText] = useState<string>('');
 
   const filteredHistory = useMemo(() => 
     plantHistory.filter((item) => {
@@ -49,6 +49,35 @@ const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelec
     });
   }, []);
 
+  const updateFilter = useCallback((filter: 'all' | 'favorites') => () => {
+    setFilter(filter);
+  }, []);
+
+  const updateSelectPlant = useCallback((item: PlantHistoryItem) => () => {
+    onSelectPlant?.(item);
+  }, [onSelectPlant]);
+
+  const updateToggleFavorite = useCallback((id: string) => () => {
+    toggleFavorite(id);
+  }, [toggleFavorite]);
+
+  const updateRemoveFromHistory = useCallback((id: string) => () => {
+    removeFromHistory(id);
+  }, [removeFromHistory]);
+
+  const updateHandleAddNote = useCallback((id: string) => () => {
+    handleAddNote(id);
+  }, [handleAddNote]);
+
+  const updateStartEditingNote = useCallback((item: PlantHistoryItem) => () => {  
+    startEditingNote(item);
+  }, [startEditingNote]);
+
+  const cancelEditingNote = useCallback(() => {
+    setEditingNote(null);
+    setNoteText('');
+  }, []);
+
   return (
     <div className="plant-history-overlay">
       <div className="plant-history-modal">
@@ -73,13 +102,13 @@ const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelec
           <div className="filter-buttons">
             <button
               className={`filter-button ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
+              onClick={updateFilter('all')}
             >
               All ({plantHistory.length})
             </button>
             <button
               className={`filter-button ${filter === 'favorites' ? 'active' : ''}`}
-              onClick={() => setFilter('favorites')}
+              onClick={updateFilter('favorites')}
             >
               Favorites ({plantHistory.filter(item => item.isFavorite).length})
             </button>
@@ -111,19 +140,19 @@ const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelec
                       className="card-image"
                       loading="lazy"
                       quality={0.6}
-                      onClick={() => onSelectPlant?.(item)}
+                      onClick={updateSelectPlant(item)}
                     />
                     <div className="card-actions">
                       <button
                         className={`favorite-button ${item.isFavorite ? 'favorited' : ''}`}
-                        onClick={() => toggleFavorite(item.id)}
+                        onClick={updateToggleFavorite(item.id)}
                         title={item.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                       >
                         {item.isFavorite ? '❤️' : '🤍'}
                       </button>
                       <button
                         className="delete-button"
-                        onClick={() => removeFromHistory(item.id)}
+                        onClick={updateRemoveFromHistory(item.id)}
                         title="Remove from history"
                       >
                         🗑️
@@ -165,16 +194,13 @@ const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelec
                           <div className="note-actions">
                             <button
                               className="save-note-button"
-                              onClick={() => handleAddNote(item.id)}
+                              onClick={updateHandleAddNote(item.id)}
                             >
                               Save
                             </button>
                             <button
                               className="cancel-note-button"
-                              onClick={() => {
-                                setEditingNote(null);
-                                setNoteText('');
-                              }}
+                              onClick={cancelEditingNote}
                             >
                               Cancel
                             </button>
@@ -189,7 +215,7 @@ const PlantHistory: React.FC<PlantHistoryProps> = React.memo(({ onClose, onSelec
                           )}
                           <button
                             className="edit-note-button"
-                            onClick={() => startEditingNote(item)}
+                            onClick={updateStartEditingNote(item)}
                           >
                             {item.notes ? 'Edit Note' : 'Add Note'}
                           </button>

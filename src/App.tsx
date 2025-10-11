@@ -14,6 +14,10 @@ const App: React.FC = () => {
   const { appState, setOffline } = usePlantStore();
   const [showHistory, setShowHistory] = useState(false);
 
+  const updateShowHistory = (history: boolean) => () => {
+    setShowHistory(history);
+  };
+
   useEffect(() => {
     const updateOnlineStatus = () => {
       setOffline(!navigator.onLine);
@@ -46,7 +50,7 @@ const App: React.FC = () => {
           <div className="header-actions">
             <button 
               className="history-button"
-              onClick={() => setShowHistory(true)}
+              onClick={updateShowHistory(true)}
               title="View Plant History"
             >
               📚 History
@@ -84,9 +88,8 @@ const App: React.FC = () => {
         {showHistory && (
           <Suspense fallback={<LoadingSpinner message="Loading plant history..." />}>
             <PlantHistory 
-              onClose={() => setShowHistory(false)}
+              onClose={updateShowHistory(false)}
               onSelectPlant={(plant) => {
-                console.log('Selected plant:', plant);
                 // Could open detailed view here
               }}
             />

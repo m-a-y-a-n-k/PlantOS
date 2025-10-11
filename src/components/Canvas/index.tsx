@@ -1,14 +1,20 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import Webcam from "../../helpers/WebCam";
 import "./styles.css";
 import DetectedPlantInfo from "../../components/DetectedPlantInfo";
 import LoadingSpinner from "../common/LoadingSpinner";
 import OptimizedImage from "../common/OptimizedImage";
-import { 
-  useCurrentPlant, 
-  useAutoSavePreference, 
-  usePlantActions, 
-  useCameraActions 
+import {
+  useCurrentPlant,
+  useAutoSavePreference,
+  usePlantActions,
+  useCameraActions,
 } from "../../stores/plantStore";
 import AlertBox from "../common/AlertBox";
 
@@ -22,7 +28,7 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
   const [uploading, setUploading] = useState(false);
   const [showDetectedPlantInfo, setShowDetectedPlantInfo] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  
+
   const currentPlant = useCurrentPlant();
   const autoSave = useAutoSavePreference();
   const { addToHistory, setCurrentPlant } = usePlantActions();
@@ -31,9 +37,13 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
   const webcamRef = useRef<HTMLVideoElement>(null);
   const webcam = useRef<Webcam | null>(null);
 
+  const closeAlert = useCallback(() => {
+    setAlertMessage(null);
+  }, []);
+
   const captureImage = useCallback(async () => {
     if (!webcam.current) return;
-    
+
     try {
       const capturedData = webcam.current.takeBase64Photo({
         type: "jpeg",
@@ -41,16 +51,17 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
       });
       setCaptured(true);
       setCapturedImage(capturedData.base64);
-      
+
       // Auto-save to history if enabled
       if (autoSave && currentPlant) {
         addToHistory(currentPlant, capturedData.base64);
       }
     } catch (error) {
-      console.error('Failed to capture image:', error);
-      setCameraError('Failed to capture image. Please try again.');
+      console.error("Failed to capture image:", error);
+      setCameraError("Failed to capture image. Please try again.");
     }
   }, [autoSave, currentPlant, addToHistory, setCameraError]);
+
   const discardImage = useCallback(() => {
     setCaptured(false);
     setCapturedImage(null);
@@ -76,7 +87,7 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
 
   const uploadImage = useCallback(() => {
     if (!capturedImage) return;
-    
+
     if (offline) {
       const prefix = "cloudy_pwa_";
       const rs = Math.random().toString(36).substring(2, 5);
@@ -106,22 +117,30 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
     return results;
   }, []);
 
-  const imageDisplay = useMemo(() => 
-    capturedImage ? (
-      <OptimizedImage 
-        src={capturedImage} 
-        alt="captured plant" 
-        width="350" 
-        height="275"
-        quality={0.7}
-        loading="eager"
-      />
-    ) : null, 
+  const imageDisplay = useMemo(
+    () =>
+      capturedImage ? (
+        <OptimizedImage
+          src={capturedImage}
+          alt="captured plant"
+          width="350"
+          height="275"
+          quality={0.7}
+          loading="eager"
+        />
+      ) : null,
     [capturedImage]
   );
 
-  const buttons = useMemo(() => 
-    captured ? (
+  const updateShowDetectedPlantInfo = useCallback(
+    (show: boolean) => () => {
+      setShowDetectedPlantInfo(show);
+    },
+    []
+  );
+
+  const buttons = useMemo(() => {
+    return captured ? (
       <div className="button-group">
         <button className="discardButton" onClick={discardImage}>
           Discard Plant
@@ -134,7 +153,7 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
         </button>
         <button
           className="infoButton"
-          onClick={() => setShowDetectedPlantInfo(true)}
+          onClick={updateShowDetectedPlantInfo(true)}
         >
           Show Plant Info
         </button>
@@ -143,17 +162,23 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
       <button className="captureButton" onClick={captureImage}>
         Scan Plant
       </button>
-    ), 
-    [captured, discardImage, captureImage, uploadImage]
-  );
+    );
+  }, [
+    captured,
+    discardImage,
+    captureImage,
+    uploadImage,
+    updateShowDetectedPlantInfo,
+  ]);
 
-  const uploadingMessage = useMemo(() => 
-    uploading ? (
-      <LoadingSpinner 
-        message="Saving plant to your collection..."
-        size="small"
-      />
-    ) : null,
+  const uploadingMessage = useMemo(
+    () =>
+      uploading ? (
+        <LoadingSpinner
+          message="Saving plant to your collection..."
+          size="small"
+        />
+      ) : null,
     [uploading]
   );
 
@@ -163,14 +188,17 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
     if (webcamRef.current) {
       webcam.current = new Webcam(webcamRef.current, canvasElement);
 
-      webcam.current.setup()
+      webcam.current
+        .setup()
         .then(() => {
           setCameraActive(true);
           setCameraError(null);
         })
         .catch((error) => {
-          console.error('Camera setup failed:', error);
-          setCameraError("Error getting access to your camera. Please check permissions.");
+          console.error("Camera setup failed:", error);
+          setCameraError(
+            "Error getting access to your camera. Please check permissions."
+          );
           setCameraActive(false);
         });
     }
@@ -188,7 +216,9 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
         });
         setUploading(false);
         if (!error) {
-          setAlertMessage("All saved images have been uploaded to your Library");
+          setAlertMessage(
+            "All saved images have been uploaded to your Library"
+          );
         }
       }
     };
@@ -220,20 +250,20 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
       {showDetectedPlantInfo && capturedImage && (
         <DetectedPlantInfo
           capturedImage={capturedImage}
-          closeDialog={() => setShowDetectedPlantInfo(false)}
+          closeDialog={updateShowDetectedPlantInfo(false)}
         />
       )}
       {alertMessage && (
         <AlertBox
           type="info"
           message={alertMessage}
-          onClose={() => setAlertMessage(null)}
+          onClose={closeAlert}
         />
       )}
     </div>
   );
 });
 
-Canvas.displayName = 'Canvas';
+Canvas.displayName = "Canvas";
 
 export default Canvas;
