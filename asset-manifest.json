@@ -1,9 +1,9 @@
 {
   "files": {
     "main.css": "/PlantOS/static/css/main.0f295270.css",
-    "main.js": "/PlantOS/static/js/main.e7ba577d.js",
+    "main.js": "/PlantOS/static/js/main.812f04cd.js",
     "static/css/527.30615a3b.chunk.css": "/PlantOS/static/css/527.30615a3b.chunk.css",
-    "static/js/527.aa922408.chunk.js": "/PlantOS/static/js/527.aa922408.chunk.js",
+    "static/js/527.3e61eddf.chunk.js": "/PlantOS/static/js/527.3e61eddf.chunk.js",
     "static/js/441.c5516dd4.chunk.js": "/PlantOS/static/js/441.c5516dd4.chunk.js",
     "static/css/867.0eb85a77.chunk.css": "/PlantOS/static/css/867.0eb85a77.chunk.css",
     "static/js/867.6ee14858.chunk.js": "/PlantOS/static/js/867.6ee14858.chunk.js",
@@ -12,9 +12,9 @@
     "static/media/healthy.jpg": "/PlantOS/static/media/healthy.1772b5c51fef2011cacf.jpg",
     "index.html": "/PlantOS/index.html",
     "main.0f295270.css.map": "/PlantOS/static/css/main.0f295270.css.map",
-    "main.e7ba577d.js.map": "/PlantOS/static/js/main.e7ba577d.js.map",
+    "main.812f04cd.js.map": "/PlantOS/static/js/main.812f04cd.js.map",
     "527.30615a3b.chunk.css.map": "/PlantOS/static/css/527.30615a3b.chunk.css.map",
-    "527.aa922408.chunk.js.map": "/PlantOS/static/js/527.aa922408.chunk.js.map",
+    "527.3e61eddf.chunk.js.map": "/PlantOS/static/js/527.3e61eddf.chunk.js.map",
     "441.c5516dd4.chunk.js.map": "/PlantOS/static/js/441.c5516dd4.chunk.js.map",
     "867.0eb85a77.chunk.css.map": "/PlantOS/static/css/867.0eb85a77.chunk.css.map",
     "867.6ee14858.chunk.js.map": "/PlantOS/static/js/867.6ee14858.chunk.js.map",
@@ -22,6 +22,6 @@
   },
   "entrypoints": [
     "static/css/main.0f295270.css",
-    "static/js/main.e7ba577d.js"
+    "static/js/main.812f04cd.js"
   ]
 }
