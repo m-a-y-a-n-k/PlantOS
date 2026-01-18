@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/PlantOS/static/css/main.0f295270.css",
-    "main.js": "/PlantOS/static/js/main.812f04cd.js",
-    "static/css/527.30615a3b.chunk.css": "/PlantOS/static/css/527.30615a3b.chunk.css",
-    "static/js/527.3e61eddf.chunk.js": "/PlantOS/static/js/527.3e61eddf.chunk.js",
+    "main.css": "/PlantOS/static/css/main.b8479707.css",
+    "main.js": "/PlantOS/static/js/main.f456a27e.js",
+    "static/css/527.161ca230.chunk.css": "/PlantOS/static/css/527.161ca230.chunk.css",
+    "static/js/527.69003f6f.chunk.js": "/PlantOS/static/js/527.69003f6f.chunk.js",
     "static/js/441.c5516dd4.chunk.js": "/PlantOS/static/js/441.c5516dd4.chunk.js",
-    "static/css/867.0eb85a77.chunk.css": "/PlantOS/static/css/867.0eb85a77.chunk.css",
+    "static/css/867.e954b9d0.chunk.css": "/PlantOS/static/css/867.e954b9d0.chunk.css",
     "static/js/867.6ee14858.chunk.js": "/PlantOS/static/js/867.6ee14858.chunk.js",
     "static/js/234.72631b78.chunk.js": "/PlantOS/static/js/234.72631b78.chunk.js",
     "static/media/garden.jpg": "/PlantOS/static/media/garden.438d0e950954d5ef4ab5.jpg",
     "static/media/healthy.jpg": "/PlantOS/static/media/healthy.1772b5c51fef2011cacf.jpg",
     "index.html": "/PlantOS/index.html",
-    "main.0f295270.css.map": "/PlantOS/static/css/main.0f295270.css.map",
-    "main.812f04cd.js.map": "/PlantOS/static/js/main.812f04cd.js.map",
-    "527.30615a3b.chunk.css.map": "/PlantOS/static/css/527.30615a3b.chunk.css.map",
-    "527.3e61eddf.chunk.js.map": "/PlantOS/static/js/527.3e61eddf.chunk.js.map",
+    "main.b8479707.css.map": "/PlantOS/static/css/main.b8479707.css.map",
+    "main.f456a27e.js.map": "/PlantOS/static/js/main.f456a27e.js.map",
+    "527.161ca230.chunk.css.map": "/PlantOS/static/css/527.161ca230.chunk.css.map",
+    "527.69003f6f.chunk.js.map": "/PlantOS/static/js/527.69003f6f.chunk.js.map",
     "441.c5516dd4.chunk.js.map": "/PlantOS/static/js/441.c5516dd4.chunk.js.map",
-    "867.0eb85a77.chunk.css.map": "/PlantOS/static/css/867.0eb85a77.chunk.css.map",
+    "867.e954b9d0.chunk.css.map": "/PlantOS/static/css/867.e954b9d0.chunk.css.map",
     "867.6ee14858.chunk.js.map": "/PlantOS/static/js/867.6ee14858.chunk.js.map",
     "234.72631b78.chunk.js.map": "/PlantOS/static/js/234.72631b78.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0f295270.css",
-    "static/js/main.812f04cd.js"
+    "static/css/main.b8479707.css",
+    "static/js/main.f456a27e.js"
   ]
 }
