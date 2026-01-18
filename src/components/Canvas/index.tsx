@@ -47,7 +47,7 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
     try {
       const capturedData = webcam.current.takeBase64Photo({
         type: "jpeg",
-        quality: 2,
+        quality: 0.9,
       });
       setCaptured(true);
       setCapturedImage(capturedData.base64);

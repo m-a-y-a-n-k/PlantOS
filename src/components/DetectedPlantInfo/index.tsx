@@ -66,6 +66,11 @@ const DetectedPlantInfo: React.FC<DetectedPlantInfoProps> = ({ capturedImage, cl
               (bestMlResult.confidence + (plantDetails.confidence || 0)) / 2
             );
           }
+
+          // If the API explicitly thinks this is not a plant, surface a clearer message.
+          if (plantDetails?.isPlant?.binary === false && (plantDetails.isPlant.probability ?? 0) > 0.6) {
+            throw new Error('This image does not appear to contain a plant. Try focusing on leaves/flowers and improving lighting.');
+          }
           
           setPlant(plantDetails);
           setCurrentPlant(plantDetails);
@@ -242,6 +247,39 @@ const DetectedPlantInfo: React.FC<DetectedPlantInfoProps> = ({ capturedImage, cl
             </div>
           )}
         </div>
+
+        {/* Health assessment (Plant.id) */}
+        {(plant.healthAssessment?.isHealthy || (plant.healthAssessment?.diseases?.length ?? 0) > 0) && (
+          <div className="plant-section">
+            <h3>Health Assessment</h3>
+            {plant.healthAssessment?.isHealthy && (
+              <p>
+                <strong>Status:</strong>{' '}
+                {plant.healthAssessment.isHealthy.binary ? 'Likely healthy' : 'Potential issues detected'}
+                {typeof plant.healthAssessment.isHealthy.probability === 'number' && (
+                  <> ({Math.round(plant.healthAssessment.isHealthy.probability * 100)}%)</>
+                )}
+              </p>
+            )}
+
+            {(plant.healthAssessment?.diseases?.length ?? 0) > 0 && (
+              <>
+                <p><strong>Top suspected issues:</strong></p>
+                <ul>
+                  {plant.healthAssessment!.diseases!
+                    .slice(0, 3)
+                    .map((d, idx) => (
+                      <li key={`${d.id ?? d.name}_${idx}`}>
+                        {d.name}
+                        {typeof d.probability === 'number' ? ` (${Math.round(d.probability * 100)}%)` : ''}
+                        {d.nonHarmful ? ' (non-harmful)' : ''}
+                      </li>
+                    ))}
+                </ul>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Additional information */}
         {(plant.family || plant.genus) && (

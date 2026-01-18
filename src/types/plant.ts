@@ -33,6 +33,47 @@ export interface PlantDimensions {
   unit?: string;
 }
 
+export interface PlantIsPlantResult {
+  binary?: boolean;
+  probability?: number;
+}
+
+export interface PlantDiseaseSuggestion {
+  id?: string;
+  name: string;
+  probability?: number;
+  nonHarmful?: boolean;
+  details?: {
+    description?: string;
+    common_names?: string[];
+    local_name?: string;
+    classification?: string[];
+    treatment?: {
+      biological?: string[];
+      chemical?: string[];
+      prevention?: string[];
+    };
+  };
+  similarImages?: Array<{
+    url?: string;
+    url_small?: string;
+    similarity?: number;
+    citation?: string;
+    license_name?: string;
+    license_url?: string;
+  }>;
+}
+
+export interface PlantHealthAssessment {
+  isHealthy?: {
+    binary?: boolean;
+    probability?: number;
+  };
+  diseases?: PlantDiseaseSuggestion[];
+  // When enabled in the API, may include defect/severity metrics; keep flexible.
+  defectScore?: number;
+}
+
 export interface PlantDetails extends PlantIdentification {
   image?: string;
   watering?: string;
@@ -60,6 +101,10 @@ export interface PlantDetails extends PlantIdentification {
   combinedConfidence?: number;
   fromML?: boolean;
   images?: string[];
+
+  // Plant.id v3 signals
+  isPlant?: PlantIsPlantResult;
+  healthAssessment?: PlantHealthAssessment;
 }
 
 export interface MLResult {

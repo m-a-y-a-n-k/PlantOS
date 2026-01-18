@@ -76,7 +76,17 @@ class Webcam {
 
   takeBase64Photo = ({ type, quality }: { type?: string; quality?: number } = { type: "png", quality: 1 }): { base64: string; imageHeight: number; imageWidth: number } => {
     const { imageHeight, imageWidth } = this._drawImage();
-    const base64 = this.canvasElement.toDataURL("image/" + type, quality);
+    // For image/jpeg, `quality` must be between 0 and 1.
+    // Some callers were passing values > 1 which leads to inconsistent results across browsers.
+    const normalizedType = (type || "png").toLowerCase();
+    const q =
+      normalizedType === "jpeg" || normalizedType === "jpg"
+        ? Math.min(1, Math.max(0, quality ?? 0.92))
+        : undefined;
+    const base64 = this.canvasElement.toDataURL(
+      "image/" + normalizedType,
+      q as any
+    );
     return { base64, imageHeight, imageWidth };
   };
 }

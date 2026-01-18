@@ -48,18 +48,37 @@ class PlantApiService {
     const formData = new FormData();
     
     formData.append('images', blob);
-    formData.append('modifiers', JSON.stringify([
-      'crops_fast', 'similar_images', 'health_only', 'disease_similar_images'
-    ]));
-    formData.append('plant_language', 'en');
-    formData.append('plant_details', JSON.stringify([
-      'common_names', 'url', 'description', 'taxonomy', 'rank',
-      'gbif_id', 'inaturalist_id', 'image', 'synonyms', 'edible_parts',
-      'watering', 'propagation_methods'
-    ]));
+    // Plant.id v3 parameters (Kindwise). These enable meaningful health stats.
+    // Note: multipart/form-data values are strings.
+    formData.append('language', 'en');
+    formData.append('health', 'all'); // include identification + health assessment
+    formData.append('disease_level', 'all');
+    formData.append('symptoms', 'true');
+    formData.append('similar_images', 'true');
+    formData.append(
+      'details',
+      [
+        'common_names',
+        'url',
+        'description',
+        'taxonomy',
+        'rank',
+        'gbif_id',
+        'inaturalist_id',
+        'image',
+        'synonyms',
+        'edible_parts',
+        'watering',
+        'propagation_methods',
+      ].join(',')
+    );
+    formData.append(
+      'disease_details',
+      ['common_names', 'classification', 'description', 'treatment', 'local_name'].join(',')
+    );
 
     try {
-      const response = await fetch(`${this.baseUrls.plantId}/identification`, {
+      const response = await fetch(`${this.baseUrls.plantId}/identify`, {
         method: 'POST',
         headers: {
           'Api-Key': this.apiKeys.plantId,
@@ -203,30 +222,59 @@ class PlantApiService {
 
   // Format Plant.id API response
   formatPlantIdResponse(data: any): PlantDetails | null {
-    if (!data.suggestions || data.suggestions.length === 0) {
+    const suggestion =
+      data?.result?.classification?.suggestions?.[0] ??
+      data?.suggestions?.[0]; // tolerate older response shapes
+
+    if (!suggestion) {
       return null;
     }
 
-    const suggestion = data.suggestions[0];
-    const plant = suggestion.plant_details;
+    const plant = suggestion?.details ?? suggestion?.plant_details ?? {};
+    const taxonomy = plant?.taxonomy ?? {};
+    const isPlant = data?.result?.is_plant ?? data?.result?.isPlant ?? undefined;
+    const isHealthy = data?.result?.is_healthy ?? data?.result?.isHealthy ?? undefined;
+    const disease = data?.result?.disease ?? undefined;
+
+    const diseases =
+      disease?.suggestions?.map((s: any) => ({
+        id: s.id,
+        name: String(s.name ?? 'Unknown issue'),
+        probability: typeof s.probability === 'number' ? s.probability : undefined,
+        nonHarmful: typeof s.non_harmful === 'boolean' ? s.non_harmful : undefined,
+        details: s.details,
+        similarImages: s.similar_images,
+      })) ?? [];
 
     return {
-      label: plant.common_names?.[0] || plant.scientific_name,
-      scientificName: plant.scientific_name,
+      label: plant.common_names?.[0] || plant.scientific_name || suggestion.name,
+      scientificName: plant.scientific_name || suggestion.name,
       confidence: suggestion.probability,
-      description: plant.description?.value || 'No description available',
+      description: plant.description?.value || plant.description || 'No description available',
       commonNames: plant.common_names || [],
-      family: plant.taxonomy?.family,
-      genus: plant.taxonomy?.genus,
-      watering: plant.watering?.max || 'Regular watering',
+      family: taxonomy?.family,
+      genus: taxonomy?.genus,
+      watering: plant.watering?.max || plant.watering || 'Regular watering',
       light: 'Bright indirect light', // Default as not provided by Plant.id
       propagation: plant.propagation_methods || [],
       edibleParts: plant.edible_parts || [],
-      image: plant.image?.value,
+      image: plant.image?.value || plant.image,
       gbifId: plant.gbif_id,
       inaturalistId: plant.inaturalist_id,
       synonyms: plant.synonyms || [],
-      source: 'Plant.id'
+      isPlant: isPlant
+        ? { binary: isPlant.binary, probability: isPlant.probability }
+        : undefined,
+      healthAssessment: isHealthy || diseases.length > 0
+        ? {
+            isHealthy: isHealthy
+              ? { binary: isHealthy.binary, probability: isHealthy.probability }
+              : undefined,
+            diseases,
+            defectScore: disease?.defect_score,
+          }
+        : undefined,
+      source: 'Plant.id',
     };
   }
 

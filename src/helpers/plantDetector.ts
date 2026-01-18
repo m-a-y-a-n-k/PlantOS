@@ -10,6 +10,28 @@ declare global {
 
 const ml5 = (window as any).ml5;
 
+function loadMl5Classifier(modelName: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    if (!ml5?.imageClassifier) {
+      reject(new Error('ml5 is not available. Ensure it is loaded in public/index.html'));
+      return;
+    }
+
+    try {
+      // ml5 imageClassifier is callback-based; some builds also return a promise.
+      const maybeClassifier = ml5.imageClassifier(modelName, () => {
+        resolve(maybeClassifier);
+      });
+
+      if (maybeClassifier && typeof maybeClassifier.then === 'function') {
+        (maybeClassifier as Promise<any>).then(resolve).catch(reject);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 // Image preprocessing for better plant detection
 function preprocessImage(imageElement: HTMLImageElement): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
@@ -56,25 +78,21 @@ async function detect(base64: string, classifiers: any): Promise<MLResult[]> {
   // Preprocess image for better plant detection
   const processedCanvas = preprocessImage(img);
   
-  const results = [];
+  const results: Array<{ label: string; confidence: number; model: string }> = [];
   
-  // Use MobileNet for general classification
+  // Use MobileNet for general classification (generic, but fast offline fallback)
   if (classifiers.mobilenet) {
     try {
       const mobileNetResults = await classifiers.mobilenet.classify(processedCanvas);
-      results.push(...mobileNetResults.map((r: any) => ({ ...r, model: 'MobileNet' })));
+      results.push(
+        ...mobileNetResults.map((r: any) => ({
+          label: String(r.label ?? ''),
+          confidence: Number(r.confidence ?? 0),
+          model: 'MobileNet',
+        }))
+      );
     } catch (error) {
       console.warn('MobileNet classification failed:', error);
-    }
-  }
-  
-  // Use DenseNet for more detailed classification
-  if (classifiers.densenet) {
-    try {
-      const denseNetResults = await classifiers.densenet.classify(processedCanvas);
-      results.push(...denseNetResults.map((r: any) => ({ ...r, model: 'DenseNet' })));
-    } catch (error) {
-      console.warn('DenseNet classification failed:', error);
     }
   }
   
@@ -90,6 +108,10 @@ async function detect(base64: string, classifiers: any): Promise<MLResult[]> {
       result.label.toLowerCase().includes(keyword)
     )
   );
+
+  // If results look "non-plant", keep them but don't over-trust them:
+  // return both plant-filtered and unfiltered for upstream logic to decide.
+  const sortedAll = results.sort((a, b) => b.confidence - a.confidence);
   
   // If we found plant-specific results, prioritize them
   if (plantResults.length > 0) {
@@ -97,14 +119,13 @@ async function detect(base64: string, classifiers: any): Promise<MLResult[]> {
   }
   
   // Otherwise return all results sorted by confidence
-  return results.sort((a: any, b: any) => b.confidence - a.confidence);
+  return sortedAll;
 }
 
 // Enhanced plant detector hook with multiple models
 export default function usePlantDetector() {
   const [classifiers, setClassifiers] = useState({
-    mobilenet: null,
-    densenet: null
+    mobilenet: null as any
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,21 +134,13 @@ export default function usePlantDetector() {
     const initializeModels = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Initialize MobileNet (fast, general purpose)
-        const mobilenet = ml5.imageClassifier("MobileNet");
-        
-        // Try to initialize DenseNet (more accurate for complex images)
-        let densenet = null;
-        try {
-          densenet = ml5.imageClassifier("DenseNet");
-        } catch (denseNetError) {
-          console.warn('DenseNet not available, using MobileNet only:', denseNetError);
-        }
+        // Initialize MobileNet and wait until it's actually ready.
+        const mobilenet = await loadMl5Classifier('MobileNet');
         
         setClassifiers({
-          mobilenet,
-          densenet
+          mobilenet
         });
         
         setLoading(false);
