@@ -54,14 +54,43 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
   background-image: url("garden.jpg");
   background-size: cover;
-  background-repeat: repeat-y;
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+.App::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Readability overlay + playful color wash */
+  background:
+    radial-gradient(1200px 900px at 15% 10%, rgba(46, 204, 113, 0.22), transparent 55%),
+    radial-gradient(1000px 800px at 85% 20%, rgba(58, 166, 255, 0.22), transparent 60%),
+    radial-gradient(1000px 800px at 60% 100%, rgba(255, 111, 177, 0.18), transparent 60%),
+    linear-gradient(180deg, rgba(6, 27, 18, 0.78), rgba(11, 42, 29, 0.62));
+}
+
+.App > * {
+  position: relative;
+  z-index: 1;
 }
 
 .App-header {
-  padding: 20px;
-  background: linear-gradient(25deg, #0b4a26e2, white);
+  padding: 18px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-left: none;
+  border-right: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   font-size: calc(1rem + 1vmin);
-  color: white;
+  color: var(--text-inverse);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -81,31 +110,34 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .history-button {
-  background: rgb(17 87 19 / 51%); 
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.28), rgba(58, 166, 255, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: var(--text-inverse);
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .history-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.36), rgba(255, 111, 177, 0.18));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .offline-indicator {
-  background: #e74c3c;
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.95), rgba(255, 176, 32, 0.7));
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
   animation: pulse 2s infinite;
+  box-shadow: var(--shadow-sm);
 }
 
 @keyframes pulse {
@@ -132,16 +164,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .mainContent {
-  padding: 24px;
+  padding: 24px 16px 36px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .App-title {
-  color: rgb(16, 41, 28);
+  color: var(--text-inverse);
   margin-left: 24px;
+  letter-spacing: 0.2px;
 }
 
 .App-subtitle {
-  color: rgb(11, 52, 87);
+  color: rgba(255, 255, 255, 0.86);
   margin-left: 36px;
 }
 
@@ -161,8 +196,9 @@ button {
 }
 
 button:hover {
-  transform: scale(1.1);
-  transition: 1s ease-in-out linear 0ms;
+  /* Global buttons should not “jump”; individual components handle their own hover */
+  transform: none;
+  transition: none;
 }
 
 .button-group {
@@ -178,6 +214,7 @@ button:hover {
   justify-content: center;
   align-items: center;
   gap: 12px;
+  padding-bottom: 10px;
 }
 
 @media (max-width: 768px) {

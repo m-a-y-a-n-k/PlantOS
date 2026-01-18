@@ -229,35 +229,44 @@ const Canvas: React.FC<CanvasProps> = React.memo(({ offline }) => {
 
   return (
     <div className="uploadCanvas">
-      <div className="mediaGroup">
-        <video
-          autoPlay
-          playsInline
-          muted
-          ref={webcamRef}
-          width="100vw"
-          height="275"
-        />
-        {imageDisplay && (
-          <figure className="imageCanvas">
-            {imageDisplay}
-            <figcaption>Image captured from feed.</figcaption>
-          </figure>
+      <div className="scan-card">
+        <div className="mediaGroup">
+          <video
+            autoPlay
+            playsInline
+            muted
+            ref={webcamRef}
+            width="100vw"
+            height="275"
+          />
+          {imageDisplay && (
+            <figure className="imageCanvas">
+              {imageDisplay}
+              <figcaption>Image captured from feed.</figcaption>
+            </figure>
+          )}
+        </div>
+
+        {!captured && (
+          <p className="scan-hint">
+            Tip: fill the frame with leaves/flowers for best results.
+          </p>
+        )}
+
+        {buttons}
+        {uploadingMessage}
+        {alertMessage && (
+          <AlertBox
+            type="info"
+            message={alertMessage}
+            onClose={closeAlert}
+          />
         )}
       </div>
-      {buttons}
-      {uploadingMessage}
       {showDetectedPlantInfo && capturedImage && (
         <DetectedPlantInfo
           capturedImage={capturedImage}
           closeDialog={updateShowDetectedPlantInfo(false)}
-        />
-      )}
-      {alertMessage && (
-        <AlertBox
-          type="info"
-          message={alertMessage}
-          onClose={closeAlert}
         />
       )}
     </div>

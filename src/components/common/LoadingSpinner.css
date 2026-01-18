@@ -1,4 +1,4 @@
-.loading-spinner {
+.pos-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,112 +7,64 @@
   text-align: center;
 }
 
-.loading-spinner--small {
+.pos-loading--small {
   padding: 1rem;
 }
 
-.loading-spinner--large {
+.pos-loading--large {
   padding: 3rem;
   min-height: 300px;
 }
 
-.spinner-container {
-  position: relative;
-  margin-bottom: 1.5rem;
+.pos-loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.plant-spinner {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  animation: gentle-sway 3s ease-in-out infinite;
+.pos-loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(58, 166, 255, 0.65));
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  animation: pos-dot 900ms ease-in-out infinite;
 }
 
-.loading-spinner--small .plant-spinner {
-  width: 40px;
-  height: 40px;
+.pos-loading-dot:nth-child(2) {
+  animation-delay: 120ms;
+  background: linear-gradient(135deg, rgba(58, 166, 255, 0.95), rgba(255, 111, 177, 0.55));
 }
 
-.loading-spinner--large .plant-spinner {
-  width: 120px;
-  height: 120px;
+.pos-loading-dot:nth-child(3) {
+  animation-delay: 240ms;
+  background: linear-gradient(135deg, rgba(255, 176, 32, 0.9), rgba(46, 204, 113, 0.55));
 }
 
-.leaf {
-  position: absolute;
-  font-size: 2rem;
-  animation: leaf-dance 2s ease-in-out infinite;
-}
-
-.loading-spinner--small .leaf {
-  font-size: 1rem;
-}
-
-.loading-spinner--large .leaf {
-  font-size: 3rem;
-}
-
-.leaf-1 {
-  top: 10px;
-  left: 20px;
-  animation-delay: 0s;
-  transform-origin: bottom center;
-}
-
-.leaf-2 {
-  top: 20px;
-  right: 15px;
-  animation-delay: 0.5s;
-  transform-origin: bottom center;
-}
-
-.leaf-3 {
-  top: 30px;
-  left: 10px;
-  animation-delay: 1s;
-  transform-origin: bottom center;
-}
-
-.stem {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2.5rem;
-  animation: stem-grow 2s ease-in-out infinite;
-}
-
-.loading-spinner--small .stem {
-  font-size: 1.25rem;
-}
-
-.loading-spinner--large .stem {
-  font-size: 3.75rem;
-}
-
-.loading-text h3 {
+.pos-loading-title {
   margin: 0 0 0.5rem 0;
-  color: #2c3e50;
+  color: var(--text);
   font-size: 1.2rem;
   font-weight: 500;
 }
 
-.loading-spinner--small .loading-text h3 {
+.pos-loading--small .pos-loading-title {
   font-size: 1rem;
 }
 
-.loading-spinner--large .loading-text h3 {
+.pos-loading--large .pos-loading-title {
   font-size: 1.5rem;
 }
 
-.loading-step {
+.pos-loading-step {
   margin: 0 0 1rem 0;
-  color: #7f8c8d;
+  color: var(--text-muted);
   font-size: 0.9rem;
-  font-style: italic;
 }
 
-.progress-container {
+.pos-loading-progress {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -120,81 +72,59 @@
   max-width: 300px;
 }
 
-.progress-bar {
+.pos-loading-progressBar {
   flex: 1;
   height: 8px;
-  background: #ecf0f1;
-  border-radius: 4px;
+  background: rgba(20, 48, 36, 0.08);
+  border-radius: 999px;
   overflow: hidden;
 }
 
-.progress-fill {
+.pos-loading-progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #27ae60, #2ecc71);
-  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(46, 204, 113, 0.95), rgba(58, 166, 255, 0.85), rgba(255, 111, 177, 0.65));
+  border-radius: 999px;
   transition: width 0.3s ease;
-  animation: progress-shimmer 2s ease-in-out infinite;
 }
 
-.progress-text {
+.pos-loading-progressText {
   font-size: 0.875rem;
-  color: #2c3e50;
+  color: var(--text);
   font-weight: 500;
   min-width: 40px;
 }
 
 /* Animations */
-@keyframes gentle-sway {
+@keyframes pos-dot {
   0%, 100% {
-    transform: rotate(0deg);
+    transform: translateY(0);
+    opacity: 0.55;
   }
   50% {
-    transform: rotate(2deg);
-  }
-}
-
-@keyframes leaf-dance {
-  0%, 100% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(-5deg) scale(1.05);
-  }
-  75% {
-    transform: rotate(5deg) scale(0.95);
-  }
-}
-
-@keyframes stem-grow {
-  0%, 100% {
-    transform: translateX(-50%) scaleY(1);
-  }
-  50% {
-    transform: translateX(-50%) scaleY(1.1);
-  }
-}
-
-@keyframes progress-shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
+    transform: translateY(-5px);
+    opacity: 1;
   }
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .loading-spinner {
+  .pos-loading {
     padding: 1.5rem;
   }
   
-  .progress-container {
+  .pos-loading-progress {
     flex-direction: column;
     gap: 0.5rem;
   }
   
-  .progress-bar {
+  .pos-loading-progressBar {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pos-loading-dot {
+    animation: none;
+    opacity: 0.9;
   }
 }

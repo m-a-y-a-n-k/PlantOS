@@ -15,29 +15,26 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   step 
 }) => {
   return (
-    <div className={`loading-spinner loading-spinner--${size}`}>
-      <div className="spinner-container">
-        <div className="plant-spinner">
-          <div className="leaf leaf-1">🌿</div>
-          <div className="leaf leaf-2">🌿</div>
-          <div className="leaf leaf-3">🌿</div>
-          <div className="stem">🌱</div>
-        </div>
+    <div className={`pos-loading pos-loading--${size}`} role="status" aria-live="polite">
+      <div className="pos-loading-indicator" aria-hidden="true">
+        <span className="pos-loading-dot" />
+        <span className="pos-loading-dot" />
+        <span className="pos-loading-dot" />
       </div>
       
-      <div className="loading-text">
-        <h3>{message}</h3>
-        {step && <p className="loading-step">{step}</p>}
+      <div className="pos-loading-text">
+        <h3 className="pos-loading-title">{message}</h3>
+        {step && <p className="pos-loading-step">{step}</p>}
         
         {progress !== undefined && (
-          <div className="progress-container">
-            <div className="progress-bar">
+          <div className="pos-loading-progress">
+            <div className="pos-loading-progressBar">
               <div 
-                className="progress-fill" 
+                className="pos-loading-progressFill" 
                 style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
               />
             </div>
-            <span className="progress-text">{Math.round(progress)}%</span>
+            <span className="pos-loading-progressText">{Math.round(progress)}%</span>
           </div>
         )}
       </div>
